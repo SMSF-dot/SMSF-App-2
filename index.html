@@ -3107,6 +3107,14 @@
       if (currentBibleChapter) {
         renderBibleChapter(currentBibleChapter.chapter, BIBLE_BOOK_BY_CODE.get(currentBibleChapter.bookCode), currentBibleChapter.chapterNumber);
       }
+      if (kind === "highlighted") {
+        refreshScriptureReferencePills();
+        const savedContainer = document.getElementById("bibleSavedContainer");
+        if (!savedContainer.hidden) {
+          const activeFilter = savedContainer.querySelector(".bible-saved-filters button.active")?.dataset.filter || "all";
+          await renderBibleSavedTreasury(activeFilter);
+        }
+      }
       return !existing;
     }
 
@@ -3135,24 +3143,29 @@
       `);
       const actionStatus = document.getElementById("scriptureActionStatus");
       document.getElementById("loveScriptureBtn").addEventListener("click", async (event) => {
+        const btn = event.currentTarget;
         try {
           const saved = await toggleSavedScripture("loved", canonicalReference, verse);
-          event.currentTarget.textContent = saved ? "Loved" : "Love This Verse";
-          event.currentTarget.classList.toggle("btn-gold", saved);
-          event.currentTarget.classList.toggle("btn-outline", !saved);
+          if (btn) {
+            btn.textContent = saved ? "Loved" : "Love This Verse";
+            btn.classList.toggle("btn-gold", saved);
+            btn.classList.toggle("btn-outline", !saved);
+          }
           actionStatus.textContent = saved ? "Added to Loved Scriptures." : "Removed from Loved Scriptures.";
         } catch (error) {
           actionStatus.textContent = `Could not update this verse: ${error.message}`;
         }
       });
       document.getElementById("highlightScriptureBtn").addEventListener("click", async (event) => {
+        const btn = event.currentTarget;
         try {
           const saved = await toggleSavedScripture("highlighted", canonicalReference, verse);
-          event.currentTarget.textContent = saved ? "Highlighted" : "Highlight Verse";
-          event.currentTarget.classList.toggle("btn-gold", saved);
-          event.currentTarget.classList.toggle("btn-outline", !saved);
+          if (btn) {
+            btn.textContent = saved ? "Highlighted" : "Highlight Verse";
+            btn.classList.toggle("btn-gold", saved);
+            btn.classList.toggle("btn-outline", !saved);
+          }
           actionStatus.textContent = saved ? "Verse highlighted in your Bible reader and scripture cards." : "Highlight removed.";
-          refreshScriptureReferencePills();
         } catch (error) {
           actionStatus.textContent = `Could not update this highlight: ${error.message}`;
         }
@@ -3201,18 +3214,20 @@
 
       const status = document.getElementById("bibleVerseActionStatus");
       document.getElementById("loveBibleVerseBtn").addEventListener("click", async (event) => {
+        const btn = event.currentTarget;
         try {
           const isSaved = await toggleSavedScripture("loved", ref, verseText);
-          event.currentTarget.textContent = isSaved ? "Loved" : "Love This Verse";
+          if (btn) btn.textContent = isSaved ? "Loved" : "Love This Verse";
           status.textContent = isSaved ? "Added to Loved Scriptures." : "Removed from Loved Scriptures.";
         } catch (error) {
           status.textContent = `Could not update this verse: ${error.message}`;
         }
       });
       document.getElementById("highlightBibleVerseBtn").addEventListener("click", async (event) => {
+        const btn = event.currentTarget;
         try {
           const isHighlighted = await toggleSavedScripture("highlighted", ref, verseText);
-          event.currentTarget.textContent = isHighlighted ? "Highlighted" : "Highlight Verse";
+          if (btn) btn.textContent = isHighlighted ? "Highlighted" : "Highlight Verse";
           status.textContent = isHighlighted ? "Verse highlighted in the Bible reader." : "Verse highlight removed.";
         } catch (error) {
           status.textContent = `Could not update this highlight: ${error.message}`;
