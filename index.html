@@ -392,6 +392,93 @@
       color: var(--sage-deep);
       margin-bottom: 6px;
     }
+
+    /* Answered Prayer Rain & Sunrise Celebration */
+    .glory-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 28px 22px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #121917 0%, #1F312A 55%, #3B4938 100%);
+      animation: skySunrise 4.2s ease forwards;
+    }
+
+    .glory-overlay.active { display: flex; }
+
+    @keyframes skySunrise {
+      0% { background: linear-gradient(180deg, #0E1412 0%, #1B2823 65%, #26332D 100%); }
+      45% { background: linear-gradient(180deg, #1B2D26 0%, #3E5648 55%, #8F7434 100%); }
+      100% { background: linear-gradient(180deg, #23382F 0%, #5B735F 48%, #E5B95C 100%); }
+    }
+
+    .rain-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      animation: rainFade 4s ease forwards;
+    }
+
+    @keyframes rainFade {
+      0% { opacity: 0.95; }
+      65% { opacity: 0.7; }
+      100% { opacity: 0; }
+    }
+
+    .rain-drop {
+      position: absolute;
+      top: -30px;
+      width: 2px;
+      height: 22px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(247, 224, 163, 0.85) 100%);
+      border-radius: 999px;
+      animation: fallDrop linear infinite;
+    }
+
+    @keyframes fallDrop {
+      0% { transform: translateY(-30px); opacity: 0; }
+      20% { opacity: 0.9; }
+      100% { transform: translateY(105vh); opacity: 0; }
+    }
+
+    .rising-sun {
+      position: absolute;
+      bottom: -140px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #FFF9DB 0%, #F7C95C 48%, rgba(229, 169, 60, 0) 74%);
+      box-shadow: 0 0 90px rgba(247, 201, 92, 0.85);
+      pointer-events: none;
+      animation: sunAscend 3.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes sunAscend {
+      0% { bottom: -160px; opacity: 0.2; transform: translateX(-50%) scale(0.8); }
+      100% { bottom: 34%; opacity: 1; transform: translateX(-50%) scale(1.15); }
+    }
+
+    .glory-content {
+      position: relative;
+      z-index: 5;
+      max-width: 390px;
+      opacity: 0;
+      transform: translateY(16px);
+      animation: scriptureReveal 1.4s ease 1.5s forwards;
+    }
+
+    @keyframes scriptureReveal {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
   </style>
 </head>
 <body>
@@ -473,6 +560,14 @@
           <button id="enableNotifyBtn" type="button" style="background:var(--charcoal); color:#FFFFFF; border:none; border-radius:999px; padding:4px 10px; font-size:10px; font-weight:700; cursor:pointer;">Enable Alerts</button>
         </div>
         <div id="thanksgivingWatchList"></div>
+      </div>
+
+      <!-- Long-Term Faith Endurance Check-In Banner (60+ / 90+ Days) -->
+      <div id="enduranceWatchBox" style="display:none; background:linear-gradient(135deg, #24382E 0%, #161817 100%); color:#FAF7F2; border:1.5px solid var(--gold); border-radius:16px; padding:16px; margin-bottom:16px;">
+        <div style="font-size:10px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--gold); margin-bottom:6px;">
+          Endurance &amp; Stewardship Watch • Hebrews 10:36
+        </div>
+        <div id="enduranceWatchContent"></div>
       </div>
 
       <!-- Three Chambers Navigation -->
@@ -932,6 +1027,34 @@
       const active = petitions.filter((p) => p.status !== "answered");
       const answered = petitions.filter((p) => p.status === "answered");
 
+      // Check for Long-Term Petitions (60 Days / 90 Days+)
+      const enduranceBox = document.getElementById("enduranceWatchBox");
+      const enduranceContent = document.getElementById("enduranceWatchContent");
+      const dueForCheckIn = active.find((p) => {
+        const createdMs = typeof p.createdAt === "number" ? p.createdAt : (p.createdAt?.toMillis ? p.createdAt.toMillis() : Date.now());
+        const daysOnAltar = Math.floor((Date.now() - createdMs) / (1000 * 60 * 60 * 24));
+        const lastCheckDays = p.lastEnduranceCheckDays || 0;
+        return (daysOnAltar >= 60 && lastCheckDays < 60) || (daysOnAltar >= 90 && lastCheckDays < 90);
+      });
+
+      if (dueForCheckIn) {
+        const createdMs = typeof dueForCheckIn.createdAt === "number" ? dueForCheckIn.createdAt : (dueForCheckIn.createdAt?.toMillis ? dueForCheckIn.createdAt.toMillis() : Date.now());
+        const daysOnAltar = Math.floor((Date.now() - createdMs) / (1000 * 60 * 60 * 24));
+        const monthsLabel = daysOnAltar >= 90 ? "3 months" : "2 months";
+        enduranceBox.style.display = "block";
+        enduranceContent.innerHTML = `
+          <p style="font-size:13.5px; line-height:1.5; margin-bottom:12px;">
+            Your petition <strong style="color:var(--gold);">"${dueForCheckIn.title}"</strong> has been on the altar for <strong>${monthsLabel}</strong>. Do you have any progress, or has your prayer been answered?
+          </p>
+          <div style="display:flex; flex-wrap:wrap; gap:8px;">
+            <button class="btn btn-gold btn-sm mark-answered-btn" data-id="${dueForCheckIn.id}" type="button">Yes — Raise Memorial Stone</button>
+            <button class="btn btn-outline btn-sm open-endurance-btn" data-id="${dueForCheckIn.id}" data-days="${daysOnAltar}" style="color:#FAF7F2; border-color:#FAF7F2;" type="button">Not Yet — Check My Heart</button>
+          </div>
+        `;
+      } else {
+        enduranceBox.style.display = "none";
+      }
+
       // Build Daily Thanksgiving Reminders
       const today = getTodayKey();
       const reminders = [];
@@ -1044,6 +1167,22 @@
             <h3 style="font-size:20px; margin-bottom:6px;">${a.title}</h3>
             <p style="font-size:13px; color:var(--ink); line-height:1.5; margin-bottom:6px;">${a.details}</p>
             ${a.testimony ? `<p style="font-size:13px; font-weight:600; color:var(--sage-deep); background:#FFFFFF; padding:8px 10px; border-radius:8px;">Testimony: "${a.testimony}"</p>` : ""}
+            ${Array.isArray(a.journeyLog) && a.journeyLog.length > 0 ? `
+              <details style="margin-top:10px; background:#FFFFFF; border:1px solid var(--border); border-radius:10px; padding:10px 12px;">
+                <summary style="font-size:12px; font-weight:700; color:var(--sage-deep); cursor:pointer;">
+                  Read the Journey of Growth (${a.journeyLog.length} Recorded ${a.journeyLog.length === 1 ? "Milestone" : "Milestones"})
+                </summary>
+                <div style="margin-top:8px; border-left:2px solid var(--gold); padding-left:10px; display:grid; gap:8px;">
+                  ${a.journeyLog.map((step) => `
+                    <div style="font-size:12px; line-height:1.45;">
+                      <strong style="color:var(--gold-deep);">${step.date} (Day ${step.daysElapsed}):</strong>
+                      ${step.feelings ? `<p style="margin-top:2px;"><em>Heart Check:</em> ${step.feelings}</p>` : ""}
+                      ${step.standing ? `<p style="margin-top:2px;"><em>Standing on the Word:</em> ${step.standing}</p>` : ""}
+                    </div>
+                  `).join("")}
+                </div>
+              </details>
+            ` : ""}
           </div>
         `;
       }).join("") : `<div class="card"><p style="font-size:13px; color:var(--ink-muted);">No memorial stones raised yet. When God answers a petition on your altar, record your testimony to place a permanent stone here.</p></div>`;
@@ -1064,6 +1203,13 @@
             localStorage.setItem("smsf_petitions", JSON.stringify(localPetitions));
           }
           loadHouseOfPrayer();
+        });
+      });
+
+      document.querySelectorAll(".open-endurance-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const petition = active.find((p) => p.id === btn.dataset.id);
+          if (petition) openEnduranceReflectionModal(petition, Number(btn.dataset.days));
         });
       });
 
@@ -1334,6 +1480,70 @@
         document.getElementById("authBtn").textContent = user ? "Sign Out" : "Sign In";
         loadHouseOfPrayer();
         loadAudits();
+      });
+    }
+
+    async function openEnduranceReflectionModal(petition, daysOnAltar) {
+      const k = petition.knowledge || matchKnowledge(petition.title, petition.details, petition.category);
+      openModal("Endurance Check-In", "Standing Firm in the Wait", `
+        <p style="font-size:13px; color:var(--ink-muted); margin-bottom:12px;">
+          Petition: <strong>${petition.title}</strong> (${daysOnAltar} days on the altar)
+        </p>
+        <div style="background:var(--gold-tint); border-left:3.5px solid var(--gold); padding:10px 12px; border-radius:8px; margin-bottom:14px; font-size:12.5px;">
+          <strong>Anchor Scripture (Habakkuk 2:3):</strong><br/>
+          The vision awaits its appointed time; though it seems slow, wait for it—it will surely come and will not delay.
+        </div>
+        <div class="field">
+          <label>1. How does this season of waiting make you feel honestly before God?</label>
+          <textarea id="endureFeelings" placeholder="Bring any frustration, weariness, or hope honestly onto the table..."></textarea>
+        </div>
+        <div class="field">
+          <label>2. Are you actively standing on the Word of God and exercising your authority?</label>
+          <textarea id="endureStanding" placeholder="Note what promises you are speaking and any areas where you need to renew your mind..."></textarea>
+        </div>
+        <div class="knowledge-box" style="margin-bottom:14px;">
+          <strong>Strengthen Your Faith With This Teaching:</strong>
+          <span>${k.lesson}</span><br/>
+          <a href="${k.shopUrl}" target="_blank" style="color:var(--sage-deep); font-weight:700; display:inline-block; margin-top:4px;">Explore Companion Resource: ${k.book} &rarr;</a>
+        </div>
+        <button id="saveEnduranceStepBtn" class="btn btn-primary" type="button">Record Growth Step &amp; Keep Standing</button>
+      `);
+
+      document.getElementById("saveEnduranceStepBtn").addEventListener("click", async () => {
+        const feelings = document.getElementById("endureFeelings").value.trim();
+        const standing = document.getElementById("endureStanding").value.trim();
+        if (!feelings && !standing) {
+          alert("Write a brief reflection on how you are standing in faith before saving.");
+          return;
+        }
+
+        const newStep = {
+          date: new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }),
+          daysElapsed: daysOnAltar,
+          feelings,
+          standing
+        };
+
+        const existingJourney = Array.isArray(petition.journeyLog) ? petition.journeyLog : [];
+        const updatedJourney = [...existingJourney, newStep];
+        const milestoneMark = daysOnAltar >= 90 ? 90 : 60;
+
+        if (isFirebaseConfigured && currentUser) {
+          await updateDoc(doc(db, "users", currentUser.uid, "petitions", petition.id), {
+            journeyLog: updatedJourney,
+            lastEnduranceCheckDays: milestoneMark
+          });
+        } else {
+          localPetitions = localPetitions.map((item) =>
+            item.id === petition.id
+              ? { ...item, journeyLog: updatedJourney, lastEnduranceCheckDays: milestoneMark }
+              : item
+          );
+          localStorage.setItem("smsf_petitions", JSON.stringify(localPetitions));
+        }
+
+        document.getElementById("appModal").classList.remove("open");
+        loadHouseOfPrayer();
       });
     }
 
