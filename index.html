@@ -490,6 +490,87 @@
       transition: background 0.2s ease, color 0.2s ease;
     }
 
+    .bible-view-switcher {
+      display: flex;
+      gap: 4px;
+      padding: 4px;
+      margin: 0 0 12px;
+      border: 1px solid rgba(197, 155, 56, 0.35);
+      border-radius: 999px;
+      background: rgba(250, 247, 242, 0.9);
+    }
+
+    .bible-view-switcher button {
+      flex: 1;
+      border: 0;
+      border-radius: 999px;
+      padding: 9px 10px;
+      background: transparent;
+      color: var(--ink-muted);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .bible-view-switcher button.active {
+      background: var(--charcoal);
+      color: var(--cream);
+      box-shadow: 0 2px 8px rgba(22, 24, 23, 0.16);
+    }
+
+    .bible-saved-filters {
+      display: flex;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+
+    .bible-saved-filters button {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 7px 12px;
+      background: #FFFFFF;
+      color: var(--ink-muted);
+      font: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .bible-saved-filters button.active {
+      background: var(--gold-tint);
+      color: var(--gold-deep);
+      border-color: var(--gold);
+    }
+
+    .bible-saved-card {
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      background: #FFFFFF;
+      color: var(--ink);
+      text-align: left;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .bible-saved-card.highlighted {
+      background: rgba(197, 155, 56, 0.14);
+      border: 1.5px solid var(--gold);
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .bible-saved-card:focus-visible,
+    .bible-view-switcher button:focus-visible,
+    .bible-saved-filters button:focus-visible {
+      outline: 2px solid var(--gold-deep);
+      outline-offset: 2px;
+    }
+
     .sr-only {
       position: absolute;
       width: 1px;
@@ -506,6 +587,11 @@
       background: #1B211E;
       color: #F5F0E7;
       border-color: rgba(197, 155, 56, 0.55);
+    }
+
+    #bibleReader[hidden],
+    #bibleSavedContainer[hidden] {
+      display: none;
     }
 
     .bible-reader-controls {
@@ -568,6 +654,7 @@
       display: flex;
       align-items: baseline;
       gap: 8px;
+      cursor: pointer;
       padding: 8px 10px;
       margin: 3px 0;
       border-radius: 10px;
@@ -1014,6 +1101,10 @@
         <h2>Berean Standard Bible</h2>
         <p>Read the public-domain BSB, chapter by chapter. Tap a verse number for scripture actions.</p>
       </div>
+      <div class="bible-view-switcher" role="group" aria-label="Bible views">
+        <button class="bible-view-btn active" data-view="read" type="button" aria-pressed="true">Read Bible</button>
+        <button class="bible-view-btn" data-view="saved" type="button" aria-pressed="false">Saved &amp; Highlighted</button>
+      </div>
       <div id="bibleReader" class="bible-reader" data-reading-mode="parchment">
         <div class="bible-reader-controls">
           <label class="sr-only" for="bibleBookSelect">Bible book</label>
@@ -1033,6 +1124,7 @@
         <div id="bibleChapterContent" aria-live="polite"></div>
         <p style="font-size:10px; color:var(--ink-muted); margin-top:14px;">Berean Standard Bible · Public domain · bible.helloao.org</p>
       </div>
+      <div id="bibleSavedContainer" hidden></div>
     </section>
 
     <!-- SCREEN 6: LIBRARY (BOOKS & GUIDES) -->
@@ -1208,6 +1300,7 @@
     let currentBibleChapter = null;
     let temporaryBibleHighlights = new Set();
     let bibleReadingMode = "parchment";
+    let bibleSavedRenderSequence = 0;
 
     // =========================================================================
     // 1. PRAYER-TO-KNOWLEDGE MATCHING ENGINE (HOSEA 4:6)
@@ -1675,6 +1768,58 @@
       }
     }
 
+    function ministryDisplayText(value) {
+      const container = document.createElement("div");
+      container.innerHTML = String(value || "");
+      return (container.textContent || "").replace(/\s+/g, " ").trim();
+    }
+
+    function ministryText(value) {
+      return ministryDisplayText(value).toLowerCase();
+    }
+
+    function findRelatedMinistryItem(ref, verseText) {
+      const parsed = parseBibleReference(ref);
+      const normalizedReference = ministryText(canonicalBibleReference(ref)).replace(/[\u2012\u2013\u2014\u2015-]/g, "-");
+      const chapterReference = parsed
+        ? ministryText(`${parsed.book.name} ${parsed.chapter}:`)
+        : "";
+      const posts = cachedPosts.map((post) => ({
+        type: "post",
+        item: post,
+        title: ministryText(post.title?.rendered),
+        searchableText: ministryText(`${post.title?.rendered || ""} ${post.excerpt?.rendered || ""} ${post.content?.rendered || ""}`),
+        scoringText: ministryText(`${post.title?.rendered || ""} ${post.excerpt?.rendered || ""}`)
+      }));
+      const podcasts = cachedPodcasts.filter((episode) => episode.audioUrl).map((episode) => ({
+        type: "podcast",
+        item: episode,
+        title: ministryText(episode.title),
+        searchableText: ministryText(`${episode.title || ""} ${episode.description || ""}`),
+        scoringText: ministryText(`${episode.title || ""} ${episode.description || ""}`)
+      }));
+
+      const directMatch = [...posts, ...podcasts].find(({ searchableText }) =>
+        searchableText.includes(normalizedReference) || (chapterReference && searchableText.includes(chapterReference))
+      );
+      if (directMatch) return { type: directMatch.type, item: directMatch.item };
+
+      const stopWords = new Set(["which", "their", "there", "about", "shall", "world", "people", "things"]);
+      const keywords = [...new Set((ministryText(verseText).match(/[a-z]{5,}/g) || [])
+        .filter((word) => !stopWords.has(word)))];
+      let bestMatch = null;
+      let bestScore = 1;
+      for (const candidate of [...posts, ...podcasts]) {
+        const score = keywords.reduce((count, keyword) =>
+          count + Number(candidate.scoringText.includes(keyword)), 0);
+        if (score > bestScore) {
+          bestMatch = candidate;
+          bestScore = score;
+        }
+      }
+      return bestMatch ? { type: bestMatch.type, item: bestMatch.item } : null;
+    }
+
     function getLocalPostFeedback() {
       try {
         const feedback = JSON.parse(localStorage.getItem("smsf_post_feedback") || "[]");
@@ -1874,6 +2019,7 @@
     }
 
     let allPodcastEpisodes = [];
+    let cachedPodcasts = [];
 
     async function loadPodcastRSS() {
       const podList = document.getElementById("podcastList");
@@ -1928,6 +2074,7 @@
             const audioUrl = item.meta?.audio_file || item.enclosure?.url || item.guid?.rendered || audioUrlFromContent(item.content?.rendered);
             return {
               title,
+              description: item.excerpt?.rendered || item.content?.rendered || "",
               pubDate: item.date,
               audioUrl,
               ...seriesDetails(title, terms)
@@ -1954,6 +2101,7 @@
             }));
             return {
               title,
+              description: item.getElementsByTagName("description")[0]?.textContent?.trim() || "",
               pubDate,
               audioUrl: enclosure?.getAttribute("url") || audioUrlFromContent(item.innerHTML) || guid,
               ...seriesDetails(title, terms)
@@ -1962,6 +2110,7 @@
         }
 
         allPodcastEpisodes = items;
+        cachedPodcasts = items;
         renderPodcastEpisodes("all");
       } catch (err) {
         podList.innerHTML = `<div class="card"><p style="font-size:13px;">Listen directly on <a href="https://open.spotify.com/show/4zRBHR5asDACkgwGqMygpn" target="_blank">Spotify</a> or <a href="https://sinceremilksolidfood.org/ssp-podcast-archive/" target="_blank">sinceremilksolidfood.org</a>.</p></div>`;
@@ -1993,13 +2142,19 @@
         btn.addEventListener("click", () => {
           const src = btn.dataset.audio;
           if (!src) return;
-          const player = document.getElementById("audioPlayer");
-          document.getElementById("audioTitle").textContent = btn.dataset.title;
-          document.getElementById("audioBar").classList.add("visible");
-          player.src = src;
-          player.play();
+          playPodcastEpisode({ audioUrl: src, title: btn.dataset.title });
         });
       });
+    }
+
+    function playPodcastEpisode(episode) {
+      if (!episode?.audioUrl) return false;
+      const player = document.getElementById("audioPlayer");
+      document.getElementById("audioTitle").textContent = episode.title || "Episode";
+      document.getElementById("audioBar").classList.add("visible");
+      player.src = episode.audioUrl;
+      player.play().catch((error) => console.warn("Could not start podcast playback.", error));
+      return true;
     }
 
     document.querySelectorAll("#seriesFilterChips .chip").forEach((chip) => {
@@ -2684,10 +2839,11 @@
           <span>${escapeHTML(verse.text)}</span>
         </div>`;
       }).join("");
-      container.querySelectorAll(".bible-verse-number").forEach((button) => {
-        button.addEventListener("click", () => {
-          const verse = chapter.verses.find((item) => String(item.number) === button.textContent);
-          if (verse) openScriptureActionMenu(`${book.name} ${chapterNumber}:${verse.number}`, verse.text);
+      container.querySelectorAll("[data-verse]").forEach((verseElement) => {
+        verseElement.addEventListener("click", () => {
+          const verseNumber = Number(verseElement.dataset.verse);
+          const verse = chapter.verses.find((item) => item.number === verseNumber);
+          if (verse) openBibleVerseInteractiveModal(book.name, chapterNumber, verseNumber, verse.text);
         });
       });
     }
@@ -2732,6 +2888,10 @@
       const bookSelect = document.getElementById("bibleBookSelect");
       bookSelect.innerHTML = BIBLE_BOOKS.map((book) => `<option value="${book.code}">${escapeHTML(book.name)}</option>`).join("");
       bookSelect.value = "GEN";
+      document.querySelectorAll(".bible-view-btn").forEach((button) => {
+        button.addEventListener("click", () => setBibleView(button.dataset.view));
+      });
+      setBibleView("read");
       document.getElementById("bibleChapterSelect").addEventListener("change", (event) => {
         loadBibleChapter(bookSelect.value, Number(event.currentTarget.value));
       });
@@ -2755,24 +2915,172 @@
       });
     }
 
+    function setBibleView(view) {
+      const savedView = view === "saved";
+      if (!savedView) bibleSavedRenderSequence += 1;
+      document.getElementById("bibleReader").hidden = savedView;
+      document.getElementById("bibleSavedContainer").hidden = !savedView;
+      document.querySelectorAll(".bible-view-btn").forEach((button) => {
+        const active = button.dataset.view === view;
+        button.classList.toggle("active", active);
+        button.setAttribute("aria-pressed", String(active));
+      });
+      if (savedView) renderBibleSavedTreasury("all");
+    }
+
+    async function getSavedVerseText(item) {
+      if (item.text) return item.text;
+      const parsed = parseBibleReference(item.reference);
+      if (!parsed) return "";
+      const chapter = await fetchBsbChapter(parsed.book.code, parsed.chapter);
+      if (!parsed.targetVerses.length) return chapter.verses.map((verse) => verse.text).join(" ");
+      return chapter.verses
+        .filter((verse) => parsed.targetVerses.includes(verse.number))
+        .map((verse) => verse.text)
+        .join(" ");
+    }
+
+    async function renderBibleSavedTreasury(filter = "all") {
+      const container = document.getElementById("bibleSavedContainer");
+      if (!currentUser || !db || !isFirebaseConfigured) {
+        container.innerHTML = `<div class="card"><p style="font-size:13px; color:var(--ink-muted);">Sign in to view your saved scriptures.</p></div>`;
+        return;
+      }
+
+      const renderSequence = ++bibleSavedRenderSequence;
+      const userId = currentUser.uid;
+      container.innerHTML = `<p style="font-size:12px; color:var(--ink-muted);">Loading saved scriptures...</p>`;
+      try {
+        await loadSavedScriptures(userId, true);
+      } catch (error) {
+        if (renderSequence !== bibleSavedRenderSequence || currentUser?.uid !== userId || container.hidden) return;
+        container.innerHTML = `<div class="card"><p style="font-size:13px; color:var(--ink-muted);">Could not load saved scriptures: ${escapeHTML(error.message)}</p></div>`;
+        return;
+      }
+      if (renderSequence !== bibleSavedRenderSequence || currentUser?.uid !== userId || container.hidden) return;
+
+      const merged = new Map();
+      for (const saved of lovedVerses.values()) {
+        const reference = saved.reference || "";
+        const key = scriptureStorageKey(reference);
+        merged.set(key, {
+          reference,
+          text: saved.text || "",
+          loved: true,
+          highlighted: false
+        });
+      }
+      for (const saved of highlightedVerses.values()) {
+        const reference = saved.reference || "";
+        const key = scriptureStorageKey(reference);
+        const current = merged.get(key);
+        merged.set(key, {
+          reference,
+          text: saved.text || current?.text || "",
+          loved: Boolean(current?.loved),
+          highlighted: true
+        });
+      }
+
+      const allItems = Array.from(merged.values()).sort((left, right) => left.reference.localeCompare(right.reference));
+      const filtered = filter === "loved"
+        ? allItems.filter((item) => item.loved)
+        : filter === "highlighted"
+          ? allItems.filter((item) => item.highlighted)
+          : allItems;
+      container.innerHTML = `
+        <div class="bible-saved-filters" role="group" aria-label="Filter saved scriptures">
+          <button class="${filter === "all" ? "active" : ""}" data-filter="all" type="button">All</button>
+          <button class="${filter === "loved" ? "active" : ""}" data-filter="loved" type="button">Loved</button>
+          <button class="${filter === "highlighted" ? "active" : ""}" data-filter="highlighted" type="button">Highlighted</button>
+        </div>
+        <div id="bibleSavedItems" aria-live="polite"></div>
+      `;
+      container.querySelectorAll(".bible-saved-filters button").forEach((button) => {
+        button.addEventListener("click", () => renderBibleSavedTreasury(button.dataset.filter));
+      });
+
+      const itemsContainer = document.getElementById("bibleSavedItems");
+      if (!allItems.length) {
+        itemsContainer.innerHTML = `<div class="card"><p style="font-size:13px; color:var(--ink-muted); margin:0;">Tap any verse while reading the Berean Standard Bible or praying on the Altar to love or highlight it here.</p></div>`;
+        return;
+      }
+      if (!filtered.length) {
+        itemsContainer.innerHTML = `<div class="card"><p style="font-size:13px; color:var(--ink-muted); margin:0;">No ${filter} scriptures saved yet.</p></div>`;
+        return;
+      }
+
+      const entries = await Promise.all(filtered.map(async (item) => {
+        if (item.text) return item;
+        try {
+          return { ...item, text: await getSavedVerseText(item) };
+        } catch (error) {
+          console.warn(`Could not load verse text for ${item.reference}.`, error);
+          return { ...item, text: "Verse text is currently unavailable." };
+        }
+      }));
+      if (renderSequence !== bibleSavedRenderSequence || currentUser?.uid !== userId || container.hidden) return;
+      itemsContainer.innerHTML = entries.map((item) => `
+        <button class="bible-saved-card${item.highlighted ? " highlighted" : ""}" data-reference="${encodeURIComponent(item.reference)}" type="button">
+          <span style="display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
+            <strong style="color:var(--sage-deep);">${escapeHTML(item.reference)}</strong>
+            ${item.loved ? `<span class="badge" style="margin:0; background:var(--sage-tint); color:var(--sage-deep);">&#9829; Loved</span>` : ""}
+            ${item.highlighted ? `<span class="badge" style="margin:0; background:var(--gold-tint); color:var(--gold-deep);">Highlighted</span>` : ""}
+          </span>
+          <span style="font-size:14px; line-height:1.55;">${escapeHTML(item.text || "")}</span>
+        </button>
+      `).join("");
+      itemsContainer.querySelectorAll(".bible-saved-card").forEach((card) => {
+        card.addEventListener("click", () => openScriptureInBible(decodeURIComponent(card.dataset.reference)));
+      });
+    }
+
+    function openScriptureInBible(reference) {
+      const parsed = parseBibleReference(reference);
+      if (!parsed) {
+        document.getElementById("bibleReaderStatus").textContent = `Could not locate scripture reference: ${reference}`;
+        setBibleView("read");
+        return false;
+      }
+      temporaryBibleHighlights.clear();
+      parsed.targetVerses.forEach((verseNumber) => {
+        temporaryBibleHighlights.add(`${parsed.book.name} ${parsed.chapter}:${verseNumber}`.toLowerCase());
+      });
+      setBibleView("read");
+      switchScreen("bible");
+      loadBibleChapter(parsed.book.code, parsed.chapter, parsed.targetVerses);
+      return true;
+    }
+
     function scriptureStorageKey(reference) {
       return canonicalBibleReference(reference).toLowerCase();
     }
 
-    async function loadSavedScriptures(userId) {
+    async function loadSavedScriptures(userId, mergeMemory = false) {
       const [lovedSnapshot, highlightedSnapshot] = await Promise.all([
         getDocs(collection(db, "users", userId, "loved_verses")),
         getDocs(collection(db, "users", userId, "highlighted_verses"))
       ]);
       if (currentUser?.uid !== userId) return;
-      lovedVerses = new Map(lovedSnapshot.docs.map((savedDoc) => {
-        const data = savedDoc.data();
-        return [scriptureStorageKey(data.reference || savedDoc.id), { id: savedDoc.id, ...data }];
-      }));
-      highlightedVerses = new Map(highlightedSnapshot.docs.map((savedDoc) => {
-        const data = savedDoc.data();
-        return [scriptureStorageKey(data.reference || savedDoc.id), { id: savedDoc.id, ...data }];
-      }));
+      const mergeSnapshot = (snapshot, existingMap) => {
+        const merged = mergeMemory ? new Map(existingMap) : new Map();
+        snapshot.docs.forEach((savedDoc) => {
+          const data = savedDoc.data();
+          const reference = data.reference || savedDoc.id;
+          const key = scriptureStorageKey(reference);
+          const existing = merged.get(key);
+          merged.set(key, {
+            ...existing,
+            id: savedDoc.id,
+            ...data,
+            reference,
+            text: data.text || existing?.text || ""
+          });
+        });
+        return merged;
+      };
+      lovedVerses = mergeSnapshot(lovedSnapshot, lovedVerses);
+      highlightedVerses = mergeSnapshot(highlightedSnapshot, highlightedVerses);
       refreshScriptureReferencePills();
       if (currentBibleChapter) {
         renderBibleChapter(currentBibleChapter.chapter, BIBLE_BOOK_BY_CODE.get(currentBibleChapter.bookCode), currentBibleChapter.chapterNumber);
@@ -2792,7 +3100,7 @@
       } else {
         const record = kind === "loved"
           ? { reference: canonicalBibleReference(reference), text, savedAt: serverTimestamp() }
-          : { reference: canonicalBibleReference(reference), highlightedAt: serverTimestamp() };
+          : { reference: canonicalBibleReference(reference), text: text || "", highlightedAt: serverTimestamp() };
         await setDoc(savedRef, record);
         savedMap.set(key, { id: encodeURIComponent(key), ...record });
       }
@@ -2855,15 +3163,75 @@
           return;
         }
         document.getElementById("appModal").classList.remove("open");
-        temporaryBibleHighlights.clear();
-        if (parsed.targetVerses.length) {
-          for (const verseNumber of parsed.targetVerses) {
-            temporaryBibleHighlights.add(`${parsed.book.name} ${parsed.chapter}:${verseNumber}`.toLowerCase());
-          }
-        }
-        switchScreen("bible");
-        loadBibleChapter(parsed.book.code, parsed.chapter, parsed.targetVerses);
+        openScriptureInBible(canonicalReference);
       });
+    }
+
+    function openBibleVerseInteractiveModal(bookName, chapter, verseNum, verseText) {
+      const ref = `${bookName} ${chapter}:${verseNum}`;
+      const loved = lovedVerses.has(scriptureStorageKey(ref));
+      const highlighted = highlightedVerses.has(scriptureStorageKey(ref));
+      const related = findRelatedMinistryItem(ref, verseText);
+      let relatedCard = "";
+      if (related?.type === "post") {
+        const title = ministryDisplayText(related.item.title?.rendered);
+        relatedCard = `
+          <section style="background:var(--sage-tint); border:1px solid rgba(61,90,76,0.28); border-radius:12px; padding:12px; margin-top:16px;">
+            <strong style="display:block; color:var(--sage-deep); margin-bottom:8px;">Deepen Your Study</strong>
+            <button id="deepStudyActionBtn" class="btn btn-outline btn-sm" type="button">Read Teaching: ${escapeHTML(title)}</button>
+          </section>`;
+      } else if (related?.type === "podcast") {
+        const title = ministryDisplayText(related.item.title);
+        relatedCard = `
+          <section style="background:var(--sage-tint); border:1px solid rgba(61,90,76,0.28); border-radius:12px; padding:12px; margin-top:16px;">
+            <strong style="display:block; color:var(--sage-deep); margin-bottom:8px;">Deepen Your Study</strong>
+            <button id="deepStudyActionBtn" class="btn btn-outline btn-sm" type="button">Listen to Episode: ${escapeHTML(title)}</button>
+          </section>`;
+      }
+
+      openModal("Berean Standard Bible", ref, `
+        <p style="font-size:15px; line-height:1.7; margin-bottom:16px;">${escapeHTML(verseText)}</p>
+        <div id="bibleVerseActionStatus" role="status" aria-live="polite"></div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <button id="loveBibleVerseBtn" class="btn btn-primary" type="button">${loved ? "Loved" : "Love This Verse"}</button>
+          <button id="highlightBibleVerseBtn" class="btn btn-primary" type="button">${highlighted ? "Highlighted" : "Highlight Verse"}</button>
+        </div>
+        ${relatedCard}
+      `);
+
+      const status = document.getElementById("bibleVerseActionStatus");
+      document.getElementById("loveBibleVerseBtn").addEventListener("click", async (event) => {
+        try {
+          const isSaved = await toggleSavedScripture("loved", ref, verseText);
+          event.currentTarget.textContent = isSaved ? "Loved" : "Love This Verse";
+          status.textContent = isSaved ? "Added to Loved Scriptures." : "Removed from Loved Scriptures.";
+        } catch (error) {
+          status.textContent = `Could not update this verse: ${error.message}`;
+        }
+      });
+      document.getElementById("highlightBibleVerseBtn").addEventListener("click", async (event) => {
+        try {
+          const isHighlighted = await toggleSavedScripture("highlighted", ref, verseText);
+          event.currentTarget.textContent = isHighlighted ? "Highlighted" : "Highlight Verse";
+          status.textContent = isHighlighted ? "Verse highlighted in the Bible reader." : "Verse highlight removed.";
+        } catch (error) {
+          status.textContent = `Could not update this highlight: ${error.message}`;
+        }
+      });
+
+      if (related) {
+        document.getElementById("deepStudyActionBtn").addEventListener("click", () => {
+          document.getElementById("appModal").classList.remove("open");
+          if (related.type === "post") {
+            openModal("Teaching", ministryDisplayText(related.item.title?.rendered) || "Teaching", related.item.content?.rendered || "");
+            return;
+          }
+          switchScreen("listen");
+          if (!playPodcastEpisode({ ...related.item, title: ministryDisplayText(related.item.title) })) {
+            status.textContent = "This episode does not have a playable audio file.";
+          }
+        });
+      }
     }
 
     function renderProfileAvatar(element, photoUrl, displayName, size) {
@@ -3251,6 +3619,7 @@
           temporaryBibleHighlights.clear();
           cachedPosts = [];
           allPodcastEpisodes = [];
+          cachedPodcasts = [];
           renderAuthButton(null);
           clearHousePrayerViews();
           document.getElementById("blogList").replaceChildren();
