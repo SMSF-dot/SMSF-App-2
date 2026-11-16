@@ -581,23 +581,9 @@
       border: 1.5px solid var(--gold);
       border-radius: 14px;
       position: relative;
-      padding: 14px;
-      margin: 12px 0;
+      padding: 14px 16px;
+      margin: 16px 0;
     }
-
-    .bible-verse-cherub {
-      position: absolute;
-      top: -22px;
-      right: 18px;
-      width: 42px;
-      height: 32px;
-      color: var(--gold-deep);
-      background: #F3E7CE;
-      border-radius: 14px;
-      z-index: 1;
-    }
-
-    .bible-reader[data-reading-mode="night"] .bible-verse-cherub { background: #1B211E; }
 
     .bible-verse-number {
       flex: 0 0 auto;
@@ -1360,34 +1346,65 @@
     }
 
     function parseBibleReference(reference) {
-      const match = String(reference || "").trim().replace(/\s+/g, " ")
-        .match(/^(.+?)\s+(\d+)(?::(\d+)(?:\s*[-–]\s*(\d+))?)?$/);
+      const normalizedReference = String(reference || "").trim()
+        .replace(/[\u2012\u2013\u2014\u2015-]/g, "-")
+        .replace(/[.,;:!?]+$/g, "")
+        .replace(/\s+/g, " ");
+      const match = normalizedReference.match(/^(.+?)\s+(\d+)(?::\s*(.+))?$/);
       if (!match) return null;
 
       const bookName = match[1].replace(/\./g, "").toLowerCase();
       const book = BIBLE_BOOK_BY_NAME.get(bookName) || BIBLE_BOOK_BY_CODE.get(bookName.toUpperCase());
       const chapter = Number(match[2]);
       if (!book || chapter < 1 || chapter > book.chapters) return null;
-      const startVerse = match[3] ? Number(match[3]) : null;
-      const endVerse = match[4] ? Number(match[4]) : startVerse;
-      if (startVerse !== null && (startVerse < 1 || endVerse < startVerse)) return null;
-      return { book, chapter, startVerse, endVerse };
+      const targetVerses = [];
+      if (match[3]) {
+        const verseParts = match[3].split(",");
+        for (const versePart of verseParts) {
+          const verseMatch = versePart.trim().match(/^(\d+)(?:\s*-\s*(\d+))?$/);
+          if (!verseMatch) return null;
+          const firstVerse = Number(verseMatch[1]);
+          const lastVerse = Number(verseMatch[2] || firstVerse);
+          if (firstVerse < 1 || lastVerse < firstVerse) return null;
+          for (let verse = firstVerse; verse <= lastVerse; verse += 1) targetVerses.push(verse);
+        }
+      }
+      const uniqueTargetVerses = [...new Set(targetVerses)].sort((left, right) => left - right);
+      return {
+        book,
+        chapter,
+        targetVerses: uniqueTargetVerses,
+        startVerse: uniqueTargetVerses[0] ?? null,
+        endVerse: uniqueTargetVerses[uniqueTargetVerses.length - 1] ?? null
+      };
     }
 
     function canonicalBibleReference(reference) {
       const parsed = parseBibleReference(reference);
       if (!parsed) return String(reference || "").trim();
       const chapterReference = `${parsed.book.name} ${parsed.chapter}`;
-      if (!parsed.startVerse) return chapterReference;
-      const verseRange = parsed.endVerse !== parsed.startVerse ? `-${parsed.endVerse}` : "";
-      return `${chapterReference}:${parsed.startVerse}${verseRange}`;
+      if (!parsed.targetVerses.length) return chapterReference;
+      const verseParts = [];
+      let rangeStart = parsed.targetVerses[0];
+      let rangeEnd = rangeStart;
+      for (const verse of parsed.targetVerses.slice(1)) {
+        if (verse === rangeEnd + 1) {
+          rangeEnd = verse;
+          continue;
+        }
+        verseParts.push(rangeStart === rangeEnd ? String(rangeStart) : `${rangeStart}-${rangeEnd}`);
+        rangeStart = verse;
+        rangeEnd = verse;
+      }
+      verseParts.push(rangeStart === rangeEnd ? String(rangeStart) : `${rangeStart}-${rangeEnd}`);
+      return `${chapterReference}:${verseParts.join(", ")}`;
     }
 
     function scriptureReferenceContainsVerse(reference, bookCode, chapter, verseNumber) {
       const parsed = parseBibleReference(reference);
       if (!parsed || parsed.book.code !== bookCode || parsed.chapter !== chapter) return false;
-      if (parsed.startVerse === null) return true;
-      return verseNumber >= parsed.startVerse && verseNumber <= parsed.endVerse;
+      if (!parsed.targetVerses.length) return true;
+      return parsed.targetVerses.includes(verseNumber);
     }
 
     function isVerseHighlighted(reference) {
@@ -1396,11 +1413,8 @@
       for (const savedReference of highlightedVerses.keys()) {
         const saved = parseBibleReference(savedReference);
         if (!saved || saved.book.code !== target.book.code || saved.chapter !== target.chapter) continue;
-        const targetStart = target.startVerse || 1;
-        const targetEnd = target.endVerse || Number.MAX_SAFE_INTEGER;
-        const savedStart = saved.startVerse || 1;
-        const savedEnd = saved.endVerse || Number.MAX_SAFE_INTEGER;
-        if (targetStart <= savedEnd && savedStart <= targetEnd) return true;
+        if (!target.targetVerses.length || !saved.targetVerses.length) return true;
+        if (target.targetVerses.some((verse) => saved.targetVerses.includes(verse))) return true;
       }
       return false;
     }
@@ -2650,8 +2664,21 @@
       container.innerHTML = chapter.verses.map((verse) => {
         const reference = `${book.name} ${chapterNumber}:${verse.number}`;
         const highlighted = verseMatchesSavedHighlight(book.code, chapterNumber, verse.number);
-        const cherub = highlighted ? `<svg class="bible-verse-cherub" viewBox="0 0 32 24" fill="none" stroke="var(--gold)" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21V10m0 4c-2-5-7-8-12-8 1 4 4 7 9 8-4 0-7 2-9 5 5 0 9-2 12-5m0-4c2-5 7-8 12-8-1 4-4 7-9 8 4 0 7 2 9 5-5 0-9-2-12-5M13 8c0-2 1-3 3-4 2 1 3 2 3 4" /></svg>` : "";
-        return `<div id="bible-verse-${verse.number}" class="bible-verse${highlighted ? " highlighted" : ""}">
+        const cherub = highlighted ? `<svg class="peeking-cherub" width="68" height="36" viewBox="0 0 80 42" fill="none" style="position:absolute; top:-26px; right:18px; pointer-events:none; filter:drop-shadow(0 2px 4px rgba(22,24,23,0.12));">
+  <path d="M27 25C17 23 9 16 7 9C13 10 20 13 26 18" fill="#FAF7F2" stroke="#C59B38" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M24 28C16 28 11 24 9 19C14 19 19 21 24 24" fill="#FAF7F2" stroke="#C59B38" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M53 25C63 23 71 16 73 9C67 10 60 13 54 18" fill="#FAF7F2" stroke="#C59B38" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M56 28C64 28 69 24 71 19C66 19 61 21 56 24" fill="#FAF7F2" stroke="#C59B38" stroke-width="1.5" stroke-linecap="round"/>
+  <ellipse cx="40" cy="6.5" rx="9.5" ry="2.6" stroke="#C59B38" stroke-width="1.6"/>
+  <circle cx="40" cy="20" r="10.5" fill="#FAF7F2" stroke="#C59B38" stroke-width="1.8"/>
+  <path d="M31 17C32 13 36 11 40 11C44 11 48 13 49 17" stroke="#C59B38" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M35.5 20.5C36.3 21.6 37.7 21.6 38.5 20.5" stroke="#161817" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M41.5 20.5C42.3 21.6 43.7 21.6 44.5 20.5" stroke="#161817" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M38.5 24.5C39.4 25.3 40.6 25.3 41.5 24.5" stroke="#C59B38" stroke-width="1.4" stroke-linecap="round"/>
+  <rect x="28" y="27.5" width="7" height="5.5" rx="2.8" fill="#FAF7F2" stroke="#C59B38" stroke-width="1.6"/>
+  <rect x="45" y="27.5" width="7" height="5.5" rx="2.8" fill="#FAF7F2" stroke="#C59B38" stroke-width="1.6"/>
+</svg>` : "";
+        return `<div id="bible-verse-${verse.number}" data-verse="${verse.number}" class="bible-verse${highlighted ? " highlighted" : ""}">
           ${cherub}
           <button class="bible-verse-number" type="button" aria-label="Actions for ${escapeHTML(reference)}">${verse.number}</button>
           <span>${escapeHTML(verse.text)}</span>
@@ -2665,7 +2692,7 @@
       });
     }
 
-    async function loadBibleChapter(bookCode, chapterNumber, scrollVerse) {
+    async function loadBibleChapter(bookCode, chapterNumber, targetVerses = []) {
       const book = BIBLE_BOOK_BY_CODE.get(bookCode);
       if (!book) return;
       const status = document.getElementById("bibleReaderStatus");
@@ -2685,10 +2712,14 @@
         currentBibleChapter = { bookCode: book.code, chapterNumber, chapter };
         renderBibleChapter(chapter, book, chapterNumber);
         status.textContent = `${book.name} ${chapterNumber} · Berean Standard Bible`;
-        if (scrollVerse) {
-          const target = document.getElementById(`bible-verse-${scrollVerse}`);
+        const validTargetVerses = Array.isArray(targetVerses) ? targetVerses : [targetVerses];
+        validTargetVerses.forEach((verseNumber) => {
+          const target = container.querySelector(`[data-verse="${verseNumber}"]`);
+          if (target) target.classList.add("highlighted");
+        });
+        if (validTargetVerses.length) {
+          const target = container.querySelector(`[data-verse="${validTargetVerses[0]}"]`);
           if (target) {
-            target.classList.add("highlighted");
             target.scrollIntoView({ behavior: "smooth", block: "center" });
           }
         }
@@ -2775,10 +2806,10 @@
       const canonicalReference = canonicalBibleReference(reference);
       let verse = verseText || "";
       const parsed = parseBibleReference(reference);
-      if (!verse && parsed?.startVerse) {
+      if (!verse && parsed?.targetVerses.length) {
         try {
           const chapter = await fetchBsbChapter(parsed.book.code, parsed.chapter);
-          verse = chapter.verses.filter((item) => item.number >= parsed.startVerse && item.number <= parsed.endVerse).map((item) => item.text).join(" ");
+          verse = chapter.verses.filter((item) => parsed.targetVerses.includes(item.number)).map((item) => item.text).join(" ");
         } catch (error) {
           verse = knownScripture(reference)?.text || `Verse preview unavailable: ${error.message}`;
         }
@@ -2825,13 +2856,13 @@
         }
         document.getElementById("appModal").classList.remove("open");
         temporaryBibleHighlights.clear();
-        if (parsed.startVerse) {
-          for (let verseNumber = parsed.startVerse; verseNumber <= parsed.endVerse; verseNumber += 1) {
+        if (parsed.targetVerses.length) {
+          for (const verseNumber of parsed.targetVerses) {
             temporaryBibleHighlights.add(`${parsed.book.name} ${parsed.chapter}:${verseNumber}`.toLowerCase());
           }
         }
         switchScreen("bible");
-        loadBibleChapter(parsed.book.code, parsed.chapter, parsed.startVerse);
+        loadBibleChapter(parsed.book.code, parsed.chapter, parsed.targetVerses);
       });
     }
 
