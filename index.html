@@ -46,12 +46,122 @@
       max-width: 480px;
       background: var(--cream);
       min-height: 100vh;
-      display: flex;
+      display: none;
       flex-direction: column;
       position: relative;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
       padding-bottom: 92px;
     }
+
+    .app-shell.authenticated { display: flex; }
+
+    .auth-gate-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow-y: auto;
+      padding: 24px 16px;
+      background: radial-gradient(circle at top, #24382E 0%, var(--charcoal) 58%);
+      color: var(--cream);
+    }
+
+    .auth-gate-screen[hidden] { display: none; }
+
+    .auth-gate-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--cream);
+      color: var(--ink);
+      border: 1.5px solid var(--gold);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .auth-gate-eyebrow {
+      color: var(--gold-deep);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .auth-gate-title {
+      color: var(--charcoal);
+      font-size: 30px;
+      line-height: 1.05;
+      margin-bottom: 8px;
+    }
+
+    .auth-gate-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      padding: 5px;
+      margin: 18px 0 16px;
+      background: var(--sage-tint);
+      border-radius: 12px;
+    }
+
+    .auth-gate-tab {
+      border: 0;
+      background: transparent;
+      color: var(--sage-deep);
+      border-radius: 9px;
+      padding: 10px 8px;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .auth-gate-tab.active {
+      background: var(--sage);
+      color: #FFFFFF;
+      box-shadow: 0 2px 8px rgba(22, 24, 23, 0.14);
+    }
+
+    .auth-gate-form[hidden] { display: none; }
+    .auth-gate-form .field input { background: #FFFFFF; }
+    .auth-password-wrap { display: flex; gap: 8px; }
+    .auth-password-wrap input { min-width: 0; flex: 1; }
+    .auth-password-toggle {
+      border: 1px solid var(--border);
+      background: #FFFFFF;
+      color: var(--sage-deep);
+      border-radius: 9px;
+      padding: 0 10px;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .auth-gate-error {
+      display: none;
+      color: #8A2E22;
+      background: #FBEDEA;
+      border: 1px solid #E8B7AD;
+      border-radius: 9px;
+      padding: 10px 12px;
+      margin-top: 12px;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .auth-gate-footnote {
+      color: var(--ink-muted);
+      font-size: 11px;
+      line-height: 1.5;
+      text-align: center;
+      margin-top: 18px;
+    }
+
+    .auth-gate-footnote a { color: var(--sage-deep); font-weight: 700; }
 
     h1, h2, h3, .serif { font-family: 'Cormorant Garamond', Georgia, serif; }
 
@@ -327,7 +437,7 @@
       border-radius: 28px;
       box-shadow: 0 12px 32px rgba(22, 24, 23, 0.14);
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(6, 1fr);
       padding: 6px;
       gap: 4px;
       z-index: 40;
@@ -369,6 +479,146 @@
       stroke: var(--gold-deep);
       stroke-width: 2.3;
       transform: scale(1.06);
+    }
+
+    .bible-reader {
+      background: #F3E7CE;
+      color: #2A2116;
+      border: 1px solid rgba(197, 155, 56, 0.45);
+      border-radius: 16px;
+      padding: 14px;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .bible-reader[data-reading-mode="night"] {
+      background: #1B211E;
+      color: #F5F0E7;
+      border-color: rgba(197, 155, 56, 0.55);
+    }
+
+    .bible-reader-controls {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .bible-reader-controls select {
+      min-width: 0;
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: #FFFFFF;
+      padding: 9px 10px;
+      font: inherit;
+      font-size: 13px;
+    }
+
+    .bible-reading-mode {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .bible-reading-mode button {
+      flex: 1;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 7px 8px;
+      background: #FFFFFF;
+      color: var(--ink-muted);
+      font: inherit;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .bible-reading-mode button.active {
+      background: var(--gold-tint);
+      color: var(--gold-deep);
+      border-color: var(--gold);
+    }
+
+    .bible-reader[data-reading-mode="night"] .bible-reading-mode button {
+      background: #28312C;
+      color: #E5DFD5;
+      border-color: #59645D;
+    }
+
+    .bible-reader[data-reading-mode="night"] .bible-reading-mode button.active {
+      background: rgba(197, 155, 56, 0.2);
+      color: #F7D887;
+      border-color: var(--gold);
+    }
+
+    .bible-verse {
+      position: relative;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      padding: 8px 10px;
+      margin: 3px 0;
+      border-radius: 10px;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 19px;
+      line-height: 1.55;
+    }
+
+    .bible-verse.highlighted {
+      background: rgba(197, 155, 56, 0.14);
+      border: 1.5px solid var(--gold);
+      border-radius: 14px;
+      position: relative;
+      padding: 14px;
+      margin: 12px 0;
+    }
+
+    .bible-verse-cherub {
+      position: absolute;
+      top: -22px;
+      right: 18px;
+      width: 42px;
+      height: 32px;
+      color: var(--gold-deep);
+      background: #F3E7CE;
+      border-radius: 14px;
+      z-index: 1;
+    }
+
+    .bible-reader[data-reading-mode="night"] .bible-verse-cherub { background: #1B211E; }
+
+    .bible-verse-number {
+      flex: 0 0 auto;
+      border: 0;
+      background: transparent;
+      color: var(--gold-deep);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .bible-reader[data-reading-mode="night"] .bible-verse-number { color: #F7D887; }
+
+    .scripture-highlight-pill {
+      background: rgba(197, 155, 56, 0.14) !important;
+      border: 1px solid var(--gold) !important;
+      border-radius: 999px !important;
+      padding: 3px 8px !important;
+      text-decoration: none !important;
     }
 
     /* Modal */
@@ -508,6 +758,59 @@
   </style>
 </head>
 <body>
+  <div id="authGateScreen" class="auth-gate-screen">
+    <div class="auth-gate-card">
+      <div class="auth-gate-eyebrow">Spiritual Architecture &amp; Governance</div>
+      <h1 class="auth-gate-title serif">Sincere Milk &amp; Solid Food</h1>
+      <p style="font-size:13px; color:var(--ink-muted); line-height:1.5;">Sign in or create an account to enter the ministry app.</p>
+
+      <div class="auth-gate-tabs" role="tablist" aria-label="Account access">
+        <button id="authGateSignInTab" class="auth-gate-tab active" type="button" role="tab" aria-selected="true">Sign In</button>
+        <button id="authGateCreateTab" class="auth-gate-tab" type="button" role="tab" aria-selected="false">Create Account</button>
+      </div>
+
+      <form id="authGateSignInForm" class="auth-gate-form">
+        <div class="field">
+          <label for="gateSignInEmail">Email Address</label>
+          <input id="gateSignInEmail" type="email" autocomplete="email" required />
+        </div>
+        <div class="field">
+          <label for="gateSignInPassword">Password</label>
+          <div class="auth-password-wrap">
+            <input id="gateSignInPassword" type="password" autocomplete="current-password" required />
+            <button class="auth-password-toggle" type="button" data-password-target="gateSignInPassword" aria-label="Show password">Show</button>
+          </div>
+        </div>
+        <div style="display:grid; gap:8px; margin-top:14px;">
+          <button id="gateSignInBtn" class="btn btn-primary" type="submit">Sign In</button>
+          <button id="gateGoogleSignInBtn" class="btn btn-gold" type="button">Continue with Google</button>
+        </div>
+      </form>
+
+      <form id="authGateCreateForm" class="auth-gate-form" hidden>
+        <div class="field">
+          <label for="gateRegUsername">Chosen Username</label>
+          <input id="gateRegUsername" type="text" autocomplete="username" required />
+        </div>
+        <div class="field">
+          <label for="gateRegEmail">Email Address</label>
+          <input id="gateRegEmail" type="email" autocomplete="email" required />
+        </div>
+        <div class="field">
+          <label for="gateRegPassword">Password (minimum 6 characters)</label>
+          <div class="auth-password-wrap">
+            <input id="gateRegPassword" type="password" autocomplete="new-password" minlength="6" required />
+            <button class="auth-password-toggle" type="button" data-password-target="gateRegPassword" aria-label="Show password">Show</button>
+          </div>
+        </div>
+        <button id="gateCreateAccountBtn" class="btn btn-primary" style="width:100%; margin-top:14px;" type="submit">Create Account &amp; Send Verification</button>
+      </form>
+
+      <div id="authGateError" class="auth-gate-error" role="alert"></div>
+      <p class="auth-gate-footnote">Want to explore teachings and episodes freely without an account? Visit <a href="https://sinceremilksolidfood.org" target="_blank" rel="noopener noreferrer">sinceremilksolidfood.org</a>.</p>
+    </div>
+  </div>
+
   <div class="app-shell">
     <!-- Header -->
     <header class="top-bar">
@@ -719,7 +1022,34 @@
       <div id="auditLedgerList"></div>
     </section>
 
-    <!-- SCREEN 5: LIBRARY (BOOKS & GUIDES) -->
+    <!-- SCREEN 5: BIBLE READER -->
+    <section id="screen-bible" class="screen">
+      <div class="section-header">
+        <h2>Berean Standard Bible</h2>
+        <p>Read the public-domain BSB, chapter by chapter. Tap a verse number for scripture actions.</p>
+      </div>
+      <div id="bibleReader" class="bible-reader" data-reading-mode="parchment">
+        <div class="bible-reader-controls">
+          <label class="sr-only" for="bibleBookSelect">Bible book</label>
+          <select id="bibleBookSelect" aria-label="Bible book"></select>
+          <label class="sr-only" for="bibleChapterSelect">Chapter</label>
+          <select id="bibleChapterSelect" aria-label="Chapter"></select>
+        </div>
+        <div class="bible-reader-controls" style="grid-template-columns:1fr 1fr; margin-top:-4px;">
+          <button id="biblePreviousChapterBtn" class="btn btn-outline btn-sm" type="button">&larr; Previous</button>
+          <button id="bibleNextChapterBtn" class="btn btn-outline btn-sm" type="button">Next &rarr;</button>
+        </div>
+        <div class="bible-reading-mode" role="group" aria-label="Bible reading mode">
+          <button class="bible-mode-btn active" data-mode="parchment" type="button">Cream Parchment</button>
+          <button class="bible-mode-btn" data-mode="night" type="button">Charcoal Night Watch</button>
+        </div>
+        <p id="bibleReaderStatus" style="font-size:12px; color:var(--ink-muted); margin-bottom:8px;" aria-live="polite"></p>
+        <div id="bibleChapterContent" aria-live="polite"></div>
+        <p style="font-size:10px; color:var(--ink-muted); margin-top:14px;">Berean Standard Bible · Public domain · bible.helloao.org</p>
+      </div>
+    </section>
+
+    <!-- SCREEN 6: LIBRARY (BOOKS & GUIDES) -->
     <section id="screen-library" class="screen">
       <div class="section-header">
         <h2>Kingdom Library</h2>
@@ -766,6 +1096,13 @@
         </svg>
         <span>Journal</span>
       </button>
+      <button class="nav-item" data-screen="bible" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22z" />
+          <path d="M4 5.5V22M9 8h7M9 12h7" />
+        </svg>
+        <span>Bible</span>
+      </button>
       <button class="nav-item" data-screen="library" type="button">
         <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
           <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
@@ -805,11 +1142,12 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
       getAuth, onAuthStateChanged, signInWithEmailAndPassword,
-      createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signOut, updateProfile
+      createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signOut, updateProfile,
+      sendEmailVerification
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import {
-      getFirestore, collection, addDoc, getDocs, getDoc, setDoc, doc, updateDoc,
-      query, orderBy, increment, serverTimestamp
+      getFirestore, collection, addDoc, getDocs, getDoc, setDoc, doc, updateDoc, deleteDoc,
+      query, where, orderBy, increment, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     // =========================================================================
@@ -835,6 +1173,55 @@
       auth = getAuth(app);
       db = getFirestore(app);
     }
+
+    const BIBLE_BOOKS = [
+      ["Genesis", "GEN", 50], ["Exodus", "EXO", 40], ["Leviticus", "LEV", 27],
+      ["Numbers", "NUM", 36], ["Deuteronomy", "DEU", 34], ["Joshua", "JOS", 24],
+      ["Judges", "JDG", 21], ["Ruth", "RUT", 4], ["1 Samuel", "1SA", 31],
+      ["2 Samuel", "2SA", 24], ["1 Kings", "1KI", 22], ["2 Kings", "2KI", 25],
+      ["1 Chronicles", "1CH", 29], ["2 Chronicles", "2CH", 36], ["Ezra", "EZR", 10],
+      ["Nehemiah", "NEH", 13], ["Esther", "EST", 10], ["Job", "JOB", 42],
+      ["Psalms", "PSA", 150], ["Proverbs", "PRO", 31], ["Ecclesiastes", "ECC", 12],
+      ["Song of Songs", "SNG", 8], ["Isaiah", "ISA", 66], ["Jeremiah", "JER", 52],
+      ["Lamentations", "LAM", 5], ["Ezekiel", "EZK", 48], ["Daniel", "DAN", 12],
+      ["Hosea", "HOS", 14], ["Joel", "JOL", 3], ["Amos", "AMO", 9],
+      ["Obadiah", "OBA", 1], ["Jonah", "JON", 4], ["Micah", "MIC", 7],
+      ["Nahum", "NAM", 3], ["Habakkuk", "HAB", 3], ["Zephaniah", "ZEP", 3],
+      ["Haggai", "HAG", 2], ["Zechariah", "ZEC", 14], ["Malachi", "MAL", 4],
+      ["Matthew", "MAT", 28], ["Mark", "MRK", 16], ["Luke", "LUK", 24],
+      ["John", "JHN", 21], ["Acts", "ACT", 28], ["Romans", "ROM", 16],
+      ["1 Corinthians", "1CO", 16], ["2 Corinthians", "2CO", 13], ["Galatians", "GAL", 6],
+      ["Ephesians", "EPH", 6], ["Philippians", "PHP", 4], ["Colossians", "COL", 4],
+      ["1 Thessalonians", "1TH", 5], ["2 Thessalonians", "2TH", 3], ["1 Timothy", "1TI", 6],
+      ["2 Timothy", "2TI", 4], ["Titus", "TIT", 3], ["Philemon", "PHM", 1],
+      ["Hebrews", "HEB", 13], ["James", "JAS", 5], ["1 Peter", "1PE", 5],
+      ["2 Peter", "2PE", 3], ["1 John", "1JN", 5], ["2 John", "2JN", 1],
+      ["3 John", "3JN", 1], ["Jude", "JUD", 1], ["Revelation", "REV", 22]
+    ].map(([name, code, chapters]) => ({ name, code, chapters }));
+    const BIBLE_BOOK_BY_CODE = new Map(BIBLE_BOOKS.map((book) => [book.code, book]));
+    const BIBLE_BOOK_BY_NAME = new Map(BIBLE_BOOKS.map((book) => [book.name.toLowerCase(), book]));
+    BIBLE_BOOK_BY_NAME.set("psalm", BIBLE_BOOK_BY_NAME.get("psalms"));
+    BIBLE_BOOK_BY_NAME.set("song of solomon", BIBLE_BOOK_BY_NAME.get("song of songs"));
+    BIBLE_BOOK_BY_NAME.set("canticles", BIBLE_BOOK_BY_NAME.get("song of songs"));
+    BIBLE_BOOK_BY_NAME.set("revelation of john", BIBLE_BOOK_BY_NAME.get("revelation"));
+    [
+      ["gen", "GEN"], ["ex", "EXO"], ["lev", "LEV"], ["num", "NUM"], ["deut", "DEU"],
+      ["josh", "JOS"], ["judg", "JDG"], ["ps", "PSA"], ["prov", "PRO"], ["eccl", "ECC"],
+      ["song", "SNG"], ["isa", "ISA"], ["jer", "JER"], ["lam", "LAM"], ["ezek", "EZK"],
+      ["dan", "DAN"], ["hos", "HOS"], ["obad", "OBA"], ["mic", "MIC"], ["nah", "NAM"],
+      ["hab", "HAB"], ["zeph", "ZEP"], ["zech", "ZEC"], ["mal", "MAL"], ["matt", "MAT"],
+      ["mk", "MRK"], ["lk", "LUK"], ["jn", "JHN"], ["rom", "ROM"], ["1 cor", "1CO"],
+      ["2 cor", "2CO"], ["gal", "GAL"], ["eph", "EPH"], ["phil", "PHP"], ["col", "COL"],
+      ["1 thess", "1TH"], ["2 thess", "2TH"], ["1 tim", "1TI"], ["2 tim", "2TI"],
+      ["philem", "PHM"], ["heb", "HEB"], ["jas", "JAS"], ["1 pet", "1PE"], ["2 pet", "2PE"],
+      ["1 john", "1JN"], ["2 john", "2JN"], ["3 john", "3JN"], ["rev", "REV"]
+    ].forEach(([alias, code]) => BIBLE_BOOK_BY_NAME.set(alias, BIBLE_BOOK_BY_CODE.get(code)));
+
+    let lovedVerses = new Map();
+    let highlightedVerses = new Map();
+    let currentBibleChapter = null;
+    let temporaryBibleHighlights = new Set();
+    let bibleReadingMode = "parchment";
 
     // =========================================================================
     // 1. PRAYER-TO-KNOWLEDGE MATCHING ENGINE (HOSEA 4:6)
@@ -972,9 +1359,65 @@
       return String(scripture || "").split(/[;\n]|,\s*(?=(?:[1-3]\s+)?[A-Za-z])/).map((reference) => reference.trim()).filter(Boolean);
     }
 
+    function parseBibleReference(reference) {
+      const match = String(reference || "").trim().replace(/\s+/g, " ")
+        .match(/^(.+?)\s+(\d+)(?::(\d+)(?:\s*[-–]\s*(\d+))?)?$/);
+      if (!match) return null;
+
+      const bookName = match[1].replace(/\./g, "").toLowerCase();
+      const book = BIBLE_BOOK_BY_NAME.get(bookName) || BIBLE_BOOK_BY_CODE.get(bookName.toUpperCase());
+      const chapter = Number(match[2]);
+      if (!book || chapter < 1 || chapter > book.chapters) return null;
+      const startVerse = match[3] ? Number(match[3]) : null;
+      const endVerse = match[4] ? Number(match[4]) : startVerse;
+      if (startVerse !== null && (startVerse < 1 || endVerse < startVerse)) return null;
+      return { book, chapter, startVerse, endVerse };
+    }
+
+    function canonicalBibleReference(reference) {
+      const parsed = parseBibleReference(reference);
+      if (!parsed) return String(reference || "").trim();
+      const chapterReference = `${parsed.book.name} ${parsed.chapter}`;
+      if (!parsed.startVerse) return chapterReference;
+      const verseRange = parsed.endVerse !== parsed.startVerse ? `-${parsed.endVerse}` : "";
+      return `${chapterReference}:${parsed.startVerse}${verseRange}`;
+    }
+
+    function scriptureReferenceContainsVerse(reference, bookCode, chapter, verseNumber) {
+      const parsed = parseBibleReference(reference);
+      if (!parsed || parsed.book.code !== bookCode || parsed.chapter !== chapter) return false;
+      if (parsed.startVerse === null) return true;
+      return verseNumber >= parsed.startVerse && verseNumber <= parsed.endVerse;
+    }
+
+    function isVerseHighlighted(reference) {
+      const target = parseBibleReference(reference);
+      if (!target) return highlightedVerses.has(canonicalBibleReference(reference).toLowerCase());
+      for (const savedReference of highlightedVerses.keys()) {
+        const saved = parseBibleReference(savedReference);
+        if (!saved || saved.book.code !== target.book.code || saved.chapter !== target.chapter) continue;
+        const targetStart = target.startVerse || 1;
+        const targetEnd = target.endVerse || Number.MAX_SAFE_INTEGER;
+        const savedStart = saved.startVerse || 1;
+        const savedEnd = saved.endVerse || Number.MAX_SAFE_INTEGER;
+        if (targetStart <= savedEnd && savedStart <= targetEnd) return true;
+      }
+      return false;
+    }
+
+    function applyScriptureHighlightPill(button, reference) {
+      button.classList.toggle("scripture-highlight-pill", isVerseHighlighted(reference));
+    }
+
+    function refreshScriptureReferencePills() {
+      document.querySelectorAll(".scripture-reference-btn").forEach((button) => {
+        applyScriptureHighlightPill(button, decodeURIComponent(button.dataset.reference));
+      });
+    }
+
     function renderScriptureReferences(scripture) {
       return parseScriptureReferences(scripture).map((reference) => `
-        <button class="scripture-reference-btn" data-reference="${encodeURIComponent(reference)}" type="button" style="border:0; background:none; color:var(--sage-deep); text-decoration:underline; font:inherit; font-weight:700; cursor:pointer; padding:2px 4px;">
+        <button class="scripture-reference-btn${isVerseHighlighted(reference) ? " scripture-highlight-pill" : ""}" data-reference="${encodeURIComponent(reference)}" type="button" style="border:0; background:none; color:var(--sage-deep); text-decoration:underline; font:inherit; font-weight:700; cursor:pointer; padding:2px 4px;">
           ${escapeHTML(reference)}
         </button>
       `).join(" ");
@@ -1002,7 +1445,7 @@
       syncPetitionScriptureInput();
 
       container.querySelectorAll(".recommendation-scripture-btn").forEach((button) => {
-        button.addEventListener("click", () => openScriptureModal(decodeURIComponent(button.dataset.reference)));
+        button.addEventListener("click", () => openScriptureActionMenu(decodeURIComponent(button.dataset.reference)));
       });
       container.querySelectorAll(".remove-recommended-scripture").forEach((button) => {
         button.addEventListener("click", () => {
@@ -1068,43 +1511,6 @@
       return Object.values(SCRIPTURE_WAREHOUSE)
         .flatMap((entry) => entry.scriptures)
         .find((scripture) => scripture.reference.toLowerCase() === reference.toLowerCase());
-    }
-
-    async function openScriptureModal(reference) {
-      const known = knownScripture(reference);
-      openModal("Standing Scripture", reference, `
-        <p id="standingScriptureText" style="font-size:14px; line-height:1.6; white-space:pre-line;"></p>
-        <button id="readFullChapterBtn" class="btn btn-outline btn-sm" style="margin-top:12px;" type="button">Read Full Chapter</button>
-        <div id="fullChapterScripture" style="font-size:13px; line-height:1.6; white-space:pre-line; margin-top:12px;"></div>
-      `);
-
-      const scriptureText = document.getElementById("standingScriptureText");
-      document.getElementById("readFullChapterBtn").addEventListener("click", async (event) => {
-        const button = event.currentTarget;
-        const chapterContent = document.getElementById("fullChapterScripture");
-        button.disabled = true;
-        chapterContent.textContent = "Loading chapter...";
-        try {
-          const chapter = await fetchBibleScripture(getChapterReference(reference));
-          chapterContent.textContent = `${chapter.reference}\n\n${chapter.text}`;
-        } catch (error) {
-          chapterContent.textContent = `Could not load this chapter: ${error.message}`;
-        } finally {
-          button.disabled = false;
-        }
-      });
-
-      if (known) {
-        scriptureText.textContent = known.text;
-      } else {
-        scriptureText.textContent = "Loading scripture...";
-        try {
-          const result = await fetchBibleScripture(reference);
-          scriptureText.textContent = result.text;
-        } catch (error) {
-          scriptureText.textContent = `Could not load this scripture: ${error.message}`;
-        }
-      }
     }
 
     document.getElementById("petCategory").addEventListener("change", () => updateScriptureRecommendations(true));
@@ -1255,6 +1661,75 @@
       }
     }
 
+    function getLocalPostFeedback() {
+      try {
+        const feedback = JSON.parse(localStorage.getItem("smsf_post_feedback") || "[]");
+        if (!Array.isArray(feedback)) throw new Error("Saved post feedback is not a list.");
+        return feedback;
+      } catch (error) {
+        console.warn("Could not read locally saved post feedback.", error);
+        return [];
+      }
+    }
+
+    function feedbackCreatedAt(feedback) {
+      if (typeof feedback.createdAt === "number") return feedback.createdAt;
+      if (feedback.createdAt && typeof feedback.createdAt.toMillis === "function") {
+        return feedback.createdAt.toMillis();
+      }
+      return 0;
+    }
+
+    function renderPostFeedback(postId, cloudFeedback = []) {
+      const feedbackList = document.getElementById("postFeedbackList");
+      if (!feedbackList || feedbackList.dataset.postId !== String(postId)) return;
+
+      const localFeedback = getLocalPostFeedback().filter((entry) => String(entry.postId) === String(postId));
+      const uniqueFeedback = new Map();
+      [...cloudFeedback, ...localFeedback].forEach((entry) => {
+        const key = entry.firestoreId || entry.id || JSON.stringify([
+          entry.postId, entry.type, entry.authorName, entry.message, feedbackCreatedAt(entry)
+        ]);
+        if (!uniqueFeedback.has(key)) uniqueFeedback.set(key, entry);
+      });
+
+      const entries = Array.from(uniqueFeedback.values())
+        .sort((a, b) => feedbackCreatedAt(b) - feedbackCreatedAt(a));
+      feedbackList.innerHTML = entries.length ? entries.map((entry) => `
+        <div style="background:#FFFFFF; border:1px solid var(--border); border-radius:10px; padding:12px; margin-top:10px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px;">
+            <strong style="font-size:13px; color:var(--charcoal);">${escapeHTML(entry.authorName || "Guest")}</strong>
+            <span class="badge" style="margin:0;">${entry.type === "question" ? "Question" : "Reflection / Comment"}</span>
+          </div>
+          <p style="font-size:13px; line-height:1.5; color:var(--ink); white-space:pre-wrap;">${escapeHTML(entry.message || "")}</p>
+        </div>
+      `).join("") : `<p style="font-size:13px; color:var(--ink-muted); margin-top:10px;">No reflections or questions yet. Be the first to share.</p>`;
+    }
+
+    async function loadPostFeedback(post) {
+      renderPostFeedback(post.id);
+      if (!isFirebaseConfigured || !db) return;
+
+      try {
+        const feedbackSnapshot = await getDocs(query(
+          collection(db, "post_feedback"),
+          where("postId", "==", post.id)
+        ));
+        const cloudFeedback = feedbackSnapshot.docs.map((feedbackDoc) => ({
+          ...feedbackDoc.data(),
+          id: feedbackDoc.id,
+          firestoreId: feedbackDoc.id
+        }));
+        renderPostFeedback(post.id, cloudFeedback);
+      } catch (error) {
+        const syncNotice = document.getElementById("postFeedbackSyncNotice");
+        if (syncNotice?.dataset.postId === String(post.id)) {
+          syncNotice.textContent = `Could not load online responses. Showing messages saved on this device instead: ${error.message}`;
+          syncNotice.style.display = "block";
+        }
+      }
+    }
+
     function renderPosts(posts) {
       const blogList = document.getElementById("blogList");
       if (!posts.length) {
@@ -1277,8 +1752,109 @@
 
       document.querySelectorAll(".read-post-btn").forEach((btn) => {
         btn.addEventListener("click", () => {
-          const p = cachedPosts[Number(btn.dataset.idx)];
-          openModal("Teaching", p.title.rendered, p.content.rendered);
+          const post = posts[Number(btn.dataset.idx)];
+          if (!post) return;
+
+          openModal("Teaching", post.title.rendered, `
+            ${post.content.rendered}
+            <section style="background:var(--cream-card); border:1px solid var(--border); border-radius:14px; padding:16px; margin-top:22px;">
+              <h3 style="font-size:20px; color:var(--sage-deep); margin-bottom:4px;">Reflections &amp; Questions</h3>
+              <p style="font-size:13px; color:var(--ink-muted); margin-bottom:12px;">Share what stood out or ask a question about this teaching.</p>
+              <div class="field">
+                <label for="postFeedbackType">Submission Type</label>
+                <select id="postFeedbackType">
+                  <option value="reflection">Share a Reflection / Comment</option>
+                  <option value="question">Ask a Question</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="postFeedbackName">${currentUser ? "Name" : "Name (optional)"}</label>
+                <input id="postFeedbackName" type="text" />
+              </div>
+              <div class="field">
+                <label for="postFeedbackMessage">Your Reflection or Question</label>
+                <textarea id="postFeedbackMessage" placeholder="Write your message..." rows="4"></textarea>
+              </div>
+              <button id="submitPostFeedbackBtn" class="btn btn-primary" type="button">Submit</button>
+              <div id="postFeedbackConfirmation" role="status" style="display:none; background:var(--sage-tint); color:var(--sage-deep); border:1px solid var(--sage); border-radius:10px; padding:10px 12px; margin-top:12px; font-size:13px;">Your message has been received. Thank you for engaging with the Word.</div>
+              <div id="postFeedbackSyncNotice" role="alert" data-post-id="${escapeHTML(post.id)}" style="display:none; background:var(--gold-tint); color:var(--gold-deep); border-radius:10px; padding:10px 12px; margin-top:10px; font-size:12px;"></div>
+              <div id="postFeedbackList" data-post-id="${escapeHTML(post.id)}" style="margin-top:14px;"></div>
+            </section>
+          `);
+
+          const nameInput = document.getElementById("postFeedbackName");
+          const messageInput = document.getElementById("postFeedbackMessage");
+          const submitButton = document.getElementById("submitPostFeedbackBtn");
+          nameInput.value = currentUser?.displayName || "";
+          loadPostFeedback(post);
+
+          submitButton.addEventListener("click", async () => {
+            const message = messageInput.value.trim();
+            if (!message) {
+              alert("Write a reflection or question before submitting.");
+              return;
+            }
+
+            const type = document.getElementById("postFeedbackType").value;
+            const authorName = nameInput.value.trim() || "Guest";
+            const feedbackId = `feedback-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+            const localEntry = {
+              id: feedbackId,
+              postId: post.id,
+              postTitle: post.title.rendered,
+              type,
+              authorName,
+              message,
+              userId: currentUser?.uid || "guest",
+              createdAt: Date.now()
+            };
+
+            submitButton.disabled = true;
+            try {
+              localStorage.setItem("smsf_post_feedback", JSON.stringify([
+                localEntry,
+                ...getLocalPostFeedback()
+              ]));
+            } catch (error) {
+              alert(`Could not save your message on this device: ${error.message}`);
+              submitButton.disabled = false;
+              return;
+            }
+
+            document.getElementById("postFeedbackConfirmation").style.display = "block";
+            messageInput.value = "";
+            renderPostFeedback(post.id);
+
+            if (isFirebaseConfigured && db) {
+              try {
+                const feedbackDoc = await addDoc(collection(db, "post_feedback"), {
+                  postId: post.id,
+                  postTitle: post.title.rendered,
+                  type,
+                  authorName,
+                  message,
+                  userId: currentUser?.uid || "guest",
+                  createdAt: serverTimestamp()
+                });
+                const updatedLocalFeedback = getLocalPostFeedback().map((entry) =>
+                  entry.id === feedbackId ? { ...entry, firestoreId: feedbackDoc.id } : entry
+                );
+                try {
+                  localStorage.setItem("smsf_post_feedback", JSON.stringify(updatedLocalFeedback));
+                } catch (error) {
+                  console.warn("The feedback was saved online but its local sync marker could not be updated.", error);
+                }
+                renderPostFeedback(post.id, [{ ...localEntry, firestoreId: feedbackDoc.id }]);
+              } catch (error) {
+                const syncNotice = document.getElementById("postFeedbackSyncNotice");
+                if (syncNotice?.dataset.postId === String(post.id)) {
+                  syncNotice.textContent = `Your message is saved on this device, but could not be synced online: ${error.message}`;
+                  syncNotice.style.display = "block";
+                }
+              }
+            }
+            submitButton.disabled = false;
+          });
         });
       });
     }
@@ -1421,24 +1997,59 @@
     });
 
     // =========================================================================
-    // 4. HOUSE OF PRAYER & SOUL AUDITS (CLOUD + LOCAL FALLBACK)
+    // 4. HOUSE OF PRAYER & SOUL AUDITS
     // =========================================================================
     let selectedVisibility = "private";
-    let localPetitions = JSON.parse(localStorage.getItem("smsf_petitions") || "[]");
-    let localCorporate = JSON.parse(localStorage.getItem("smsf_corporate") || JSON.stringify([
-      {
-        id: "demo-1",
-        title: "Steadfastness & Consistency in Our Spiritual Walk",
-        category: "Territory & Purpose",
-        details: "Standing together that every believer in this house moves from spiritual milk to unshakeable maturity.",
-        scripture: "Hebrews 5:14, 1 Corinthians 15:58",
-        authorName: "Nyangu (Host)",
-        agreements: 24
+    let agreedPrayerIds = [];
+    let thanksgivingLog = {};
+
+    function requireAuthenticatedUser() {
+      if (!currentUser || !db || !isFirebaseConfigured) {
+        alert("Sign in to a configured Firebase account to use this feature.");
+        return false;
       }
-    ]));
-    let localAudits = JSON.parse(localStorage.getItem("smsf_audits") || "[]");
-    let agreedPrayerIds = JSON.parse(localStorage.getItem("smsf_agreed_ids") || "[]");
-    let thanksgivingLog = JSON.parse(localStorage.getItem("smsf_thanksgiving_log") || "{}");
+      return true;
+    }
+
+    function housePrayerStateRef(userId = currentUser?.uid) {
+      return doc(db, "users", userId, "private_state", "house_of_prayer");
+    }
+
+    async function saveHousePrayerState() {
+      if (!requireAuthenticatedUser()) return false;
+      await setDoc(housePrayerStateRef(), {
+        agreedPrayerIds,
+        thanksgivingLog,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+      return true;
+    }
+
+    function clearHousePrayerViews() {
+      document.getElementById("personalAltarList").replaceChildren();
+      document.getElementById("corporateAltarList").replaceChildren();
+      document.getElementById("remembranceList").replaceChildren();
+      document.getElementById("auditLedgerList").replaceChildren();
+      document.getElementById("thanksgivingWatchList").replaceChildren();
+      document.getElementById("thanksgivingWatchBox").style.display = "none";
+      document.getElementById("enduranceWatchBox").style.display = "none";
+      ["activeCount", "answeredCount", "corporateCount"].forEach((id) => {
+        document.getElementById(id).textContent = "0";
+      });
+    }
+
+    function clearSignedOutCaches(userId) {
+      [
+        "smsf_petitions",
+        "smsf_corporate",
+        "smsf_audits",
+        "smsf_agreed_ids",
+        "smsf_thanksgiving_log"
+      ].forEach((key) => localStorage.removeItem(key));
+      if (userId) localStorage.removeItem(`smsf_profile_${userId}`);
+      Object.keys(localStorage).filter((key) => key.startsWith("smsf_profile_"))
+        .forEach((key) => localStorage.removeItem(key));
+    }
 
     function getDaysAgoText(timestamp) {
       if (!timestamp) return "today";
@@ -1454,6 +2065,7 @@
     }
 
     function sowThanksgiving(prayerId, prayerTitle) {
+      if (!requireAuthenticatedUser()) return;
       const today = getTodayKey();
       const entry = thanksgivingLog[prayerId] || { count: 0, lastDate: "" };
       if (entry.lastDate === today) {
@@ -1485,25 +2097,42 @@
         </button>
       `);
 
-      document.getElementById("confirmThanksSeedBtn").addEventListener("click", () => {
+      document.getElementById("confirmThanksSeedBtn").addEventListener("click", async () => {
+        const previousEntry = thanksgivingLog[prayerId];
         thanksgivingLog[prayerId] = { count: entry.count + 1, lastDate: today };
-        localStorage.setItem("smsf_thanksgiving_log", JSON.stringify(thanksgivingLog));
+        try {
+          await saveHousePrayerState();
+        } catch (error) {
+          if (previousEntry) thanksgivingLog[prayerId] = previousEntry;
+          else delete thanksgivingLog[prayerId];
+          alert(`Could not save your thanksgiving record: ${error.message}`);
+          return;
+        }
         document.getElementById("appModal").classList.remove("open");
         loadHouseOfPrayer();
       });
     }
 
     async function loadHouseOfPrayer() {
-      let petitions = localPetitions;
-      let corporate = localCorporate;
-
-      if (isFirebaseConfigured && currentUser) {
-        const snap = await getDocs(query(collection(db, "users", currentUser.uid, "petitions"), orderBy("createdAt", "desc")));
-        petitions = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-
-        const corpSnap = await getDocs(query(collection(db, "corporate_altar"), orderBy("createdAt", "desc")));
-        corporate = corpSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      if (!currentUser || !db || !isFirebaseConfigured) {
+        clearHousePrayerViews();
+        return;
       }
+
+      const userId = currentUser.uid;
+      const [petitionSnap, corporateSnap, stateSnap] = await Promise.all([
+        getDocs(query(collection(db, "users", userId, "petitions"), orderBy("createdAt", "desc"))),
+        getDocs(query(collection(db, "corporate_altar"), orderBy("createdAt", "desc"))),
+        getDoc(housePrayerStateRef(userId))
+      ]);
+      if (currentUser?.uid !== userId) return;
+      const petitions = petitionSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const corporate = corporateSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const prayerState = stateSnap.exists() ? stateSnap.data() : {};
+      agreedPrayerIds = Array.isArray(prayerState.agreedPrayerIds) ? prayerState.agreedPrayerIds : [];
+      thanksgivingLog = prayerState.thanksgivingLog && typeof prayerState.thanksgivingLog === "object"
+        ? prayerState.thanksgivingLog
+        : {};
 
       const active = petitions.filter((p) => p.status !== "answered");
       const answered = petitions.filter((p) => p.status === "answered");
@@ -1637,7 +2266,7 @@
       }).join("");
 
       document.querySelectorAll(".scripture-reference-btn").forEach((button) => {
-        button.addEventListener("click", () => openScriptureModal(decodeURIComponent(button.dataset.reference)));
+        button.addEventListener("click", () => openScriptureActionMenu(decodeURIComponent(button.dataset.reference)));
       });
 
       document.querySelectorAll(".recommended-lesson-btn").forEach((button) => {
@@ -1683,22 +2312,22 @@
       // Bind Mark Answered buttons
       document.querySelectorAll(".mark-answered-btn").forEach((btn) => {
         btn.addEventListener("click", async () => {
+          if (!requireAuthenticatedUser()) return;
           const id = btn.dataset.id;
           const answeredPrayer = active.find((petition) => petition.id === id);
           const prayerTitle = answeredPrayer?.title || "Answered Prayer";
           const testimony = prompt("Record a brief testimony of how God answered this prayer:") || "Answered by the faithfulness of God.";
-          if (isFirebaseConfigured && currentUser) {
+          try {
             await updateDoc(doc(db, "users", currentUser.uid, "petitions", id), {
               status: "answered",
               testimony,
               answeredAt: serverTimestamp()
             });
-          } else {
-            localPetitions = localPetitions.map((item) => item.id === id ? { ...item, status: "answered", testimony } : item);
-            localStorage.setItem("smsf_petitions", JSON.stringify(localPetitions));
+            loadHouseOfPrayer();
+            triggerGloryCelebration(prayerTitle);
+          } catch (error) {
+            alert(`Could not record this answered prayer: ${error.message}`);
           }
-          loadHouseOfPrayer();
-          triggerGloryCelebration(prayerTitle);
         });
       });
 
@@ -1715,18 +2344,18 @@
 
       document.querySelectorAll(".agree-btn").forEach((btn) => {
         btn.addEventListener("click", async () => {
+          if (!requireAuthenticatedUser()) return;
           const id = btn.dataset.id;
-          if (!agreedPrayerIds.includes(id)) {
-            agreedPrayerIds.push(id);
-            localStorage.setItem("smsf_agreed_ids", JSON.stringify(agreedPrayerIds));
+          try {
+            if (!agreedPrayerIds.includes(id)) {
+              await updateDoc(doc(db, "corporate_altar", id), { agreements: increment(1) });
+              agreedPrayerIds.push(id);
+              await saveHousePrayerState();
+            }
+            loadHouseOfPrayer();
+          } catch (error) {
+            alert(`Could not save your agreement: ${error.message}`);
           }
-          if (isFirebaseConfigured && currentUser) {
-            await updateDoc(doc(db, "corporate_altar", id), { agreements: increment(1) });
-          } else {
-            localCorporate = localCorporate.map((item) => item.id === id ? { ...item, agreements: (item.agreements || 1) + 1 } : item);
-            localStorage.setItem("smsf_corporate", JSON.stringify(localCorporate));
-          }
-          loadHouseOfPrayer();
         });
       });
 
@@ -1749,20 +2378,27 @@
     }
 
     async function loadAudits() {
-      let audits = localAudits;
-      if (isFirebaseConfigured && currentUser) {
-        const snap = await getDocs(query(collection(db, "users", currentUser.uid, "audits"), orderBy("createdAt", "desc")));
-        audits = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      if (!currentUser || !db || !isFirebaseConfigured) {
+        document.getElementById("auditLedgerList").replaceChildren();
+        return;
       }
+      const userId = currentUser.uid;
+      const snap = await getDocs(query(collection(db, "users", userId, "audits"), orderBy("createdAt", "desc")));
+      if (currentUser?.uid !== userId) return;
+      const audits = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
       const list = document.getElementById("auditLedgerList");
       list.innerHTML = audits.length ? audits.map((a, idx) => `
         <div class="card">
           <span class="badge">Sealed Soul Audit</span>
           <p style="font-size:13px; line-height:1.5; margin-bottom:6px;">${a.reflect}</p>
-          ${a.scripture ? `<p style="font-size:12px; color:var(--gold-deep); font-weight:700; margin-bottom:8px;">Anchor: ${a.scripture}</p>` : ""}
+          ${a.scripture ? `<p style="font-size:12px; color:var(--gold-deep); font-weight:700; margin-bottom:8px;">Anchor: ${renderScriptureReferences(a.scripture)}</p>` : ""}
           <button class="btn btn-outline btn-sm audit-convert-btn" data-idx="${idx}" type="button">Lay on the Altar &rarr;</button>
         </div>
       `).join("") : `<div class="card"><p style="font-size:13px; color:var(--ink-muted);">Your audit ledger is ready for your first entry.</p></div>`;
+
+      list.querySelectorAll(".scripture-reference-btn").forEach((button) => {
+        button.addEventListener("click", () => openScriptureActionMenu(decodeURIComponent(button.dataset.reference)));
+      });
 
       document.querySelectorAll(".audit-convert-btn").forEach((btn) => {
         btn.addEventListener("click", async () => {
@@ -1845,6 +2481,7 @@
     });
 
     document.getElementById("submitPetitionBtn").addEventListener("click", async () => {
+      if (!requireAuthenticatedUser()) return;
       const title = document.getElementById("petTitle").value.trim();
       const category = document.getElementById("petCategory").value;
       const details = document.getElementById("petDetails").value.trim();
@@ -1863,10 +2500,10 @@
         visibility: selectedVisibility,
         status: "active",
         knowledge,
-        createdAt: isFirebaseConfigured ? serverTimestamp() : Date.now()
+        createdAt: serverTimestamp()
       };
 
-      if (isFirebaseConfigured && currentUser) {
+      try {
         await addDoc(collection(db, "users", currentUser.uid, "petitions"), payload);
         if (selectedVisibility === "corporate") {
           const displayMode = document.getElementById("petAuthorDisplay").value;
@@ -1878,14 +2515,9 @@
             agreements: 1
           });
         }
-      } else {
-        const localItem = { id: "pet-" + Date.now(), ...payload };
-        localPetitions.unshift(localItem);
-        localStorage.setItem("smsf_petitions", JSON.stringify(localPetitions));
-        if (selectedVisibility === "corporate") {
-          localCorporate.unshift({ ...localItem, authorName: "A Fellow Believer", agreements: 1 });
-          localStorage.setItem("smsf_corporate", JSON.stringify(localCorporate));
-        }
+      } catch (error) {
+        alert(`Could not save your petition: ${error.message}`);
+        return;
       }
 
       document.getElementById("petTitle").value = "";
@@ -1896,10 +2528,11 @@
       removedRecommendedScriptures.clear();
       updateScriptureRecommendations();
       document.getElementById("petitionComposer").style.display = "none";
-      loadHouseOfPrayer();
+      await loadHouseOfPrayer();
     });
 
     async function saveSoulAudit(sendToAltar) {
+      if (!requireAuthenticatedUser()) return;
       const reflect = document.getElementById("auditReflect").value.trim();
       const scripture = document.getElementById("auditScripture").value.trim();
       const action = document.getElementById("auditAction").value.trim();
@@ -1907,12 +2540,12 @@
         alert("Write your Soul Audit reflection first.");
         return;
       }
-      const entry = { reflect, scripture, action, createdAt: isFirebaseConfigured ? serverTimestamp() : Date.now() };
-      if (isFirebaseConfigured && currentUser) {
+      const entry = { reflect, scripture, action, createdAt: serverTimestamp() };
+      try {
         await addDoc(collection(db, "users", currentUser.uid, "audits"), entry);
-      } else {
-        localAudits.unshift({ id: "aud-" + Date.now(), ...entry });
-        localStorage.setItem("smsf_audits", JSON.stringify(localAudits));
+      } catch (error) {
+        alert(`Could not save your Soul Audit: ${error.message}`);
+        return;
       }
       document.getElementById("auditReflect").value = "";
       document.getElementById("auditScripture").value = "";
@@ -1974,6 +2607,234 @@
       document.getElementById("appModal").classList.add("open");
     }
 
+    function verseTextFromContent(content) {
+      if (!Array.isArray(content)) return "";
+      return content.map((part) => {
+        if (typeof part === "string") return part;
+        if (part && typeof part === "object" && typeof part.text === "string" && part.type === "text") return part.text;
+        return "";
+      }).join("").replace(/\s+/g, " ").trim();
+    }
+
+    async function fetchBsbChapter(bookCode, chapterNumber) {
+      const cacheKey = `smsf_bsb_${bookCode}_${chapterNumber}`;
+      const cached = sessionStorage.getItem(cacheKey);
+      if (cached) return JSON.parse(cached);
+
+      const response = await fetch(`https://bible.helloao.org/api/BSB/${bookCode}/${chapterNumber}.json`);
+      if (!response.ok) throw new Error(`Bible service returned ${response.status}`);
+      const data = await response.json();
+      const content = data.chapter?.content;
+      if (!Array.isArray(content)) throw new Error("The Bible service returned an unexpected chapter format.");
+      const chapter = {
+        verses: content.filter((item) => item.type === "verse").map((item) => ({
+          number: Number(item.number),
+          text: verseTextFromContent(item.content)
+        })).filter((verse) => Number.isInteger(verse.number) && verse.number > 0 && verse.text)
+      };
+      sessionStorage.setItem(cacheKey, JSON.stringify(chapter));
+      return chapter;
+    }
+
+    function verseMatchesSavedHighlight(bookCode, chapterNumber, verseNumber) {
+      const exactReference = `${BIBLE_BOOK_BY_CODE.get(bookCode).name} ${chapterNumber}:${verseNumber}`.toLowerCase();
+      if (temporaryBibleHighlights.has(exactReference)) return true;
+      for (const reference of highlightedVerses.keys()) {
+        if (scriptureReferenceContainsVerse(reference, bookCode, chapterNumber, verseNumber)) return true;
+      }
+      return false;
+    }
+
+    function renderBibleChapter(chapter, book, chapterNumber) {
+      const container = document.getElementById("bibleChapterContent");
+      container.innerHTML = chapter.verses.map((verse) => {
+        const reference = `${book.name} ${chapterNumber}:${verse.number}`;
+        const highlighted = verseMatchesSavedHighlight(book.code, chapterNumber, verse.number);
+        const cherub = highlighted ? `<svg class="bible-verse-cherub" viewBox="0 0 32 24" fill="none" stroke="var(--gold)" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21V10m0 4c-2-5-7-8-12-8 1 4 4 7 9 8-4 0-7 2-9 5 5 0 9-2 12-5m0-4c2-5 7-8 12-8-1 4-4 7-9 8 4 0 7 2 9 5-5 0-9-2-12-5M13 8c0-2 1-3 3-4 2 1 3 2 3 4" /></svg>` : "";
+        return `<div id="bible-verse-${verse.number}" class="bible-verse${highlighted ? " highlighted" : ""}">
+          ${cherub}
+          <button class="bible-verse-number" type="button" aria-label="Actions for ${escapeHTML(reference)}">${verse.number}</button>
+          <span>${escapeHTML(verse.text)}</span>
+        </div>`;
+      }).join("");
+      container.querySelectorAll(".bible-verse-number").forEach((button) => {
+        button.addEventListener("click", () => {
+          const verse = chapter.verses.find((item) => String(item.number) === button.textContent);
+          if (verse) openScriptureActionMenu(`${book.name} ${chapterNumber}:${verse.number}`, verse.text);
+        });
+      });
+    }
+
+    async function loadBibleChapter(bookCode, chapterNumber, scrollVerse) {
+      const book = BIBLE_BOOK_BY_CODE.get(bookCode);
+      if (!book) return;
+      const status = document.getElementById("bibleReaderStatus");
+      const container = document.getElementById("bibleChapterContent");
+      document.getElementById("bibleBookSelect").value = book.code;
+      const chapterSelect = document.getElementById("bibleChapterSelect");
+      chapterSelect.innerHTML = Array.from({ length: book.chapters }, (_, index) =>
+        `<option value="${index + 1}">Chapter ${index + 1}</option>`).join("");
+      chapterSelect.value = String(chapterNumber);
+      document.getElementById("biblePreviousChapterBtn").disabled = chapterNumber === 1;
+      document.getElementById("bibleNextChapterBtn").disabled = chapterNumber === book.chapters;
+      status.textContent = `Loading ${book.name} ${chapterNumber}...`;
+      container.replaceChildren();
+
+      try {
+        const chapter = await fetchBsbChapter(book.code, chapterNumber);
+        currentBibleChapter = { bookCode: book.code, chapterNumber, chapter };
+        renderBibleChapter(chapter, book, chapterNumber);
+        status.textContent = `${book.name} ${chapterNumber} · Berean Standard Bible`;
+        if (scrollVerse) {
+          const target = document.getElementById(`bible-verse-${scrollVerse}`);
+          if (target) {
+            target.classList.add("highlighted");
+            target.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        }
+      } catch (error) {
+        status.textContent = `Could not load this chapter: ${error.message}`;
+      }
+    }
+
+    function initializeBibleReader() {
+      const bookSelect = document.getElementById("bibleBookSelect");
+      bookSelect.innerHTML = BIBLE_BOOKS.map((book) => `<option value="${book.code}">${escapeHTML(book.name)}</option>`).join("");
+      bookSelect.value = "GEN";
+      document.getElementById("bibleChapterSelect").addEventListener("change", (event) => {
+        loadBibleChapter(bookSelect.value, Number(event.currentTarget.value));
+      });
+      bookSelect.addEventListener("change", () => loadBibleChapter(bookSelect.value, 1));
+      document.getElementById("biblePreviousChapterBtn").addEventListener("click", () => {
+        if (currentBibleChapter && currentBibleChapter.chapterNumber > 1) {
+          loadBibleChapter(currentBibleChapter.bookCode, currentBibleChapter.chapterNumber - 1);
+        }
+      });
+      document.getElementById("bibleNextChapterBtn").addEventListener("click", () => {
+        if (currentBibleChapter && currentBibleChapter.chapterNumber < BIBLE_BOOK_BY_CODE.get(currentBibleChapter.bookCode).chapters) {
+          loadBibleChapter(currentBibleChapter.bookCode, currentBibleChapter.chapterNumber + 1);
+        }
+      });
+      document.querySelectorAll(".bible-mode-btn").forEach((button) => {
+        button.addEventListener("click", () => {
+          bibleReadingMode = button.dataset.mode;
+          document.getElementById("bibleReader").dataset.readingMode = bibleReadingMode;
+          document.querySelectorAll(".bible-mode-btn").forEach((modeButton) => modeButton.classList.toggle("active", modeButton === button));
+        });
+      });
+    }
+
+    function scriptureStorageKey(reference) {
+      return canonicalBibleReference(reference).toLowerCase();
+    }
+
+    async function loadSavedScriptures(userId) {
+      const [lovedSnapshot, highlightedSnapshot] = await Promise.all([
+        getDocs(collection(db, "users", userId, "loved_verses")),
+        getDocs(collection(db, "users", userId, "highlighted_verses"))
+      ]);
+      if (currentUser?.uid !== userId) return;
+      lovedVerses = new Map(lovedSnapshot.docs.map((savedDoc) => {
+        const data = savedDoc.data();
+        return [scriptureStorageKey(data.reference || savedDoc.id), { id: savedDoc.id, ...data }];
+      }));
+      highlightedVerses = new Map(highlightedSnapshot.docs.map((savedDoc) => {
+        const data = savedDoc.data();
+        return [scriptureStorageKey(data.reference || savedDoc.id), { id: savedDoc.id, ...data }];
+      }));
+      refreshScriptureReferencePills();
+      if (currentBibleChapter) {
+        renderBibleChapter(currentBibleChapter.chapter, BIBLE_BOOK_BY_CODE.get(currentBibleChapter.bookCode), currentBibleChapter.chapterNumber);
+      }
+    }
+
+    async function toggleSavedScripture(kind, reference, text) {
+      if (!requireAuthenticatedUser() || !db || !isFirebaseConfigured) return false;
+      const savedMap = kind === "loved" ? lovedVerses : highlightedVerses;
+      const collectionName = kind === "loved" ? "loved_verses" : "highlighted_verses";
+      const key = scriptureStorageKey(reference);
+      const existing = savedMap.get(key);
+      const savedRef = doc(collection(db, "users", currentUser.uid, collectionName), encodeURIComponent(key));
+      if (existing) {
+        await deleteDoc(savedRef);
+        savedMap.delete(key);
+      } else {
+        const record = kind === "loved"
+          ? { reference: canonicalBibleReference(reference), text, savedAt: serverTimestamp() }
+          : { reference: canonicalBibleReference(reference), highlightedAt: serverTimestamp() };
+        await setDoc(savedRef, record);
+        savedMap.set(key, { id: encodeURIComponent(key), ...record });
+      }
+      if (currentBibleChapter) {
+        renderBibleChapter(currentBibleChapter.chapter, BIBLE_BOOK_BY_CODE.get(currentBibleChapter.bookCode), currentBibleChapter.chapterNumber);
+      }
+      return !existing;
+    }
+
+    async function openScriptureActionMenu(reference, verseText) {
+      const canonicalReference = canonicalBibleReference(reference);
+      let verse = verseText || "";
+      const parsed = parseBibleReference(reference);
+      if (!verse && parsed?.startVerse) {
+        try {
+          const chapter = await fetchBsbChapter(parsed.book.code, parsed.chapter);
+          verse = chapter.verses.filter((item) => item.number >= parsed.startVerse && item.number <= parsed.endVerse).map((item) => item.text).join(" ");
+        } catch (error) {
+          verse = knownScripture(reference)?.text || `Verse preview unavailable: ${error.message}`;
+        }
+      }
+      const loved = lovedVerses.has(scriptureStorageKey(canonicalReference));
+      const highlighted = highlightedVerses.has(scriptureStorageKey(canonicalReference));
+      openModal("Scripture Actions", canonicalReference, `
+        <p style="font-size:14px; line-height:1.65; margin-bottom:16px;">${escapeHTML(verse || "Open this reference in the Bible reader to read the chapter.")}</p>
+        <div id="scriptureActionStatus" aria-live="polite"></div>
+        <div style="display:grid; gap:9px;">
+          <button id="loveScriptureBtn" class="btn ${loved ? "btn-gold" : "btn-outline"}" type="button"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/></svg> ${loved ? "Loved" : "Love This Verse"}</button>
+          <button id="highlightScriptureBtn" class="btn ${highlighted ? "btn-gold" : "btn-outline"}" type="button"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11 6-6 4 4-6 6"/><path d="m5 21 4-4"/><path d="M3 21h7"/></svg> ${highlighted ? "Highlighted" : "Highlight Verse"}</button>
+          <button id="goToBibleBtn" class="btn btn-primary" type="button"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Go to Scripture in Bible</button>
+        </div>
+      `);
+      const actionStatus = document.getElementById("scriptureActionStatus");
+      document.getElementById("loveScriptureBtn").addEventListener("click", async (event) => {
+        try {
+          const saved = await toggleSavedScripture("loved", canonicalReference, verse);
+          event.currentTarget.textContent = saved ? "Loved" : "Love This Verse";
+          event.currentTarget.classList.toggle("btn-gold", saved);
+          event.currentTarget.classList.toggle("btn-outline", !saved);
+          actionStatus.textContent = saved ? "Added to Loved Scriptures." : "Removed from Loved Scriptures.";
+        } catch (error) {
+          actionStatus.textContent = `Could not update this verse: ${error.message}`;
+        }
+      });
+      document.getElementById("highlightScriptureBtn").addEventListener("click", async (event) => {
+        try {
+          const saved = await toggleSavedScripture("highlighted", canonicalReference, verse);
+          event.currentTarget.textContent = saved ? "Highlighted" : "Highlight Verse";
+          event.currentTarget.classList.toggle("btn-gold", saved);
+          event.currentTarget.classList.toggle("btn-outline", !saved);
+          actionStatus.textContent = saved ? "Verse highlighted in your Bible reader and scripture cards." : "Highlight removed.";
+          refreshScriptureReferencePills();
+        } catch (error) {
+          actionStatus.textContent = `Could not update this highlight: ${error.message}`;
+        }
+      });
+      document.getElementById("goToBibleBtn").addEventListener("click", () => {
+        if (!parsed) {
+          actionStatus.textContent = "This reference could not be located in the Bible reader.";
+          return;
+        }
+        document.getElementById("appModal").classList.remove("open");
+        temporaryBibleHighlights.clear();
+        if (parsed.startVerse) {
+          for (let verseNumber = parsed.startVerse; verseNumber <= parsed.endVerse; verseNumber += 1) {
+            temporaryBibleHighlights.add(`${parsed.book.name} ${parsed.chapter}:${verseNumber}`.toLowerCase());
+          }
+        }
+        switchScreen("bible");
+        loadBibleChapter(parsed.book.code, parsed.chapter, parsed.startVerse);
+      });
+    }
+
     function renderProfileAvatar(element, photoUrl, displayName, size) {
       element.replaceChildren();
       Object.assign(element.style, {
@@ -2006,18 +2867,6 @@
       element.textContent = displayName.trim().charAt(0).toUpperCase() || "B";
     }
 
-    function getSavedProfile(user) {
-      try {
-        const savedProfile = JSON.parse(localStorage.getItem(`smsf_profile_${user.uid}`) || "{}");
-        return savedProfile && typeof savedProfile === "object" && !Array.isArray(savedProfile)
-          ? savedProfile
-          : {};
-      } catch (error) {
-        console.warn("Could not read the locally saved believer profile.", error);
-        return {};
-      }
-    }
-
     function renderAuthButton(user) {
       const authBtn = document.getElementById("authBtn");
       authBtn.replaceChildren();
@@ -2036,15 +2885,13 @@
       authBtn.style.gap = "8px";
 
       const avatar = document.createElement("span");
-      const savedProfile = getSavedProfile(user);
-      const savedPhoto = savedProfile.customPhoto || user.photoURL || "";
-      renderProfileAvatar(avatar, savedPhoto, firstName, 28);
+      renderProfileAvatar(avatar, user.photoURL || "", firstName, 28);
       const name = document.createElement("span");
       name.textContent = firstName;
       authBtn.appendChild(avatar);
       authBtn.appendChild(name);
 
-      if (!savedPhoto && isFirebaseConfigured && db) {
+      if (!user.photoURL && isFirebaseConfigured && db) {
         getDoc(doc(db, "users", user.uid, "profile", "info")).then((profileSnap) => {
           if (!profileSnap.exists() || currentUser?.uid !== user.uid) return;
           const customPhoto = profileSnap.data().customPhoto;
@@ -2056,40 +2903,30 @@
     }
 
     async function openBelieverProfile() {
-      if (!currentUser) return;
+      if (!requireAuthenticatedUser()) return;
 
-      const profileKey = `smsf_profile_${currentUser.uid}`;
-      const localProfile = getSavedProfile(currentUser);
-      let profileData = { ...localProfile };
-      if (isFirebaseConfigured && db) {
-        try {
-          const profileSnap = await getDoc(doc(db, "users", currentUser.uid, "profile", "info"));
-          if (profileSnap.exists()) {
-            const cloudProfile = profileSnap.data();
-            profileData = {
-              ...profileData,
-              ...cloudProfile,
-              customPhoto: localProfile.customPhoto || cloudProfile.customPhoto || ""
-            };
-          }
-        } catch (error) {
-          if (!Object.keys(localProfile).length) {
-            alert(`Could not load your profile: ${error.message}`);
-            return;
-          }
-          alert(`Could not load your cloud profile; showing your locally saved profile instead: ${error.message}`);
-        }
+      let profileData = {};
+      try {
+        const profileSnap = await getDoc(doc(db, "users", currentUser.uid, "profile", "info"));
+        if (profileSnap.exists()) profileData = profileSnap.data();
+      } catch (error) {
+        alert(`Could not load your profile: ${error.message}`);
+        return;
       }
 
-      const displayName = profileData.displayName || currentUser.displayName || currentUser.email?.split("@")[0] || "";
+      const username = profileData.username || currentUser.displayName || currentUser.email?.split("@")[0] || "Believer";
+      const displayName = profileData.displayName || currentUser.displayName || username;
       let customPhoto = profileData.customPhoto || currentUser.photoURL || "";
-      openModal("Believer Profile", currentUser.displayName || "My Profile", `
+      openModal("Believer Profile", displayName || "My Profile", `
         <div style="display:grid; justify-items:center; gap:10px; margin-bottom:16px;">
           <div id="profileAvatarPreview" aria-label="Profile photo"></div>
           <label class="btn btn-outline btn-sm" for="profilePhotoFile">Upload Photo</label>
           <input id="profilePhotoFile" type="file" accept="image/*" style="display:none;" />
         </div>
-        <p style="font-size:13px; margin-bottom:14px;">Registered Email Address: <strong id="profileEmail"></strong></p>
+        <p style="font-size:13px; margin-bottom:6px;">Username: <strong id="profileUsername"></strong></p>
+        <p style="font-size:13px; margin-bottom:6px;">Email Address: <strong id="profileEmail"></strong></p>
+        <p style="font-size:13px; margin-bottom:14px;">Email verification: <strong id="profileEmailVerification"></strong></p>
+        <button id="resendVerificationBtn" class="btn btn-outline btn-sm" type="button" style="display:none; margin-bottom:14px;">Resend Verification Email</button>
         <div class="field">
           <label for="profileDisplayName">Display Name</label>
           <input id="profileDisplayName" type="text" placeholder="Your name" />
@@ -2117,6 +2954,10 @@
             <span style="font-size:10px;">Sealed Soul Audits</span>
           </div>
         </div>
+        <div style="margin:14px 0;">
+          <div style="font-size:10px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold-deep); margin-bottom:8px;">Loved Scriptures</div>
+          <div id="lovedScripturesList" style="display:grid; gap:7px;"></div>
+        </div>
         <div style="display:grid; gap:8px;">
           <button id="saveProfileBtn" class="btn btn-primary" type="button">Save Profile Details</button>
           <button id="profileSignOutBtn" class="btn btn-outline" type="button">Sign Out</button>
@@ -2125,13 +2966,25 @@
 
       const photoPreview = document.getElementById("profileAvatarPreview");
       renderProfileAvatar(photoPreview, customPhoto, displayName || "Believer", 88);
+      document.getElementById("profileUsername").textContent = `@${username.replace(/^@/, "")}`;
       document.getElementById("profileEmail").textContent = currentUser.email || "Not provided";
+      document.getElementById("profileEmailVerification").textContent = currentUser.emailVerified ? "Verified" : "Not verified";
+      const resendVerificationBtn = document.getElementById("resendVerificationBtn");
+      resendVerificationBtn.style.display = currentUser.emailVerified ? "none" : "inline-flex";
       document.getElementById("profileDisplayName").value = displayName;
       document.getElementById("profileBio").value = profileData.bio || "I am sold out to Jesus Christ!";
       document.getElementById("profileLocation").value = profileData.location || "London";
       document.getElementById("profileActiveCount").textContent = document.getElementById("activeCount").textContent || "0";
       document.getElementById("profileMemorialCount").textContent = document.getElementById("answeredCount").textContent || "0";
       document.getElementById("profileAuditCount").textContent = document.querySelectorAll("#auditLedgerList .audit-convert-btn").length;
+      const lovedList = document.getElementById("lovedScripturesList");
+      const lovedItems = Array.from(lovedVerses.values());
+      lovedList.innerHTML = lovedItems.length
+        ? lovedItems.map((item) => `<button class="btn btn-outline btn-sm loved-scripture-btn" data-reference="${encodeURIComponent(item.reference)}" data-text="${encodeURIComponent(item.text || "")}" type="button" style="text-align:left;">${escapeHTML(item.reference)}</button>`).join("")
+        : `<p style="font-size:12px; color:var(--ink-muted); margin:0;">Verses you love will appear here.</p>`;
+      lovedList.querySelectorAll(".loved-scripture-btn").forEach((button) => {
+        button.addEventListener("click", () => openScriptureActionMenu(decodeURIComponent(button.dataset.reference), decodeURIComponent(button.dataset.text)));
+      });
 
       document.getElementById("profilePhotoFile").addEventListener("change", (event) => {
         const file = event.target.files[0];
@@ -2181,6 +3034,7 @@
           return;
         }
         const updatedProfile = {
+          username: newDisplayName,
           displayName: newDisplayName,
           bio: document.getElementById("profileBio").value.trim(),
           location: document.getElementById("profileLocation").value.trim(),
@@ -2188,18 +3042,22 @@
         };
 
         try {
-          localStorage.setItem(profileKey, JSON.stringify(updatedProfile));
-          if (isFirebaseConfigured && currentUser) {
-            await updateProfile(currentUser, { displayName: newDisplayName });
-            await setDoc(doc(db, "users", currentUser.uid, "profile", "info"), {
-              bio: updatedProfile.bio,
-              location: updatedProfile.location
-            }, { merge: true });
-          }
+          await updateProfile(currentUser, { displayName: newDisplayName });
+          await setDoc(doc(db, "users", currentUser.uid, "profile", "info"), updatedProfile, { merge: true });
           renderAuthButton(currentUser);
           document.getElementById("appModal").classList.remove("open");
         } catch (error) {
           alert(`Could not save your profile: ${error.message}`);
+        }
+      });
+
+      resendVerificationBtn.addEventListener("click", async () => {
+        try {
+          await sendEmailVerification(currentUser);
+          resendVerificationBtn.textContent = "Verification Email Sent";
+          resendVerificationBtn.disabled = true;
+        } catch (error) {
+          alert(`Could not send a verification email: ${error.message}`);
         }
       });
 
@@ -2217,57 +3075,186 @@
       document.getElementById("appModal").classList.remove("open");
     });
 
-    document.getElementById("authBtn").addEventListener("click", async () => {
-      if (currentUser) {
-        await openBelieverProfile();
-        return;
-      }
-      if (!isFirebaseConfigured) {
-        openModal("Setup Notice", "Connect Firebase Keys", "<p>Paste your <code>firebaseConfig</code> keys into <code>index.html</code> (Stage 2 of your manual) to activate live cloud accounts across devices.</p>");
-        return;
-      }
-      openModal("House of Prayer", "Sign In to Sync Your Altar", `
-        <div class="field"><label>First Name (For New Accounts)</label><input id="authName" type="text" placeholder="e.g., Nyangu" /></div>
-        <div class="field"><label>Email Address</label><input id="authEmail" type="email" placeholder="you@example.com" /></div>
-        <div class="field"><label>Password</label><input id="authPass" type="password" placeholder="At least 6 characters" /></div>
-        <div style="display:grid; gap:8px; margin-top:10px;">
-          <button id="emailLoginBtn" class="btn btn-primary" type="button">Sign In</button>
-          <button id="emailSignupBtn" class="btn btn-outline" type="button">Create New Account</button>
-          <button id="googleLoginBtn" class="btn btn-gold" type="button">Continue with Google</button>
-        </div>
-      `);
+    function showAuthGateError(message) {
+      const errorBox = document.getElementById("authGateError");
+      errorBox.textContent = message;
+      errorBox.style.display = "block";
+    }
 
-      document.getElementById("emailLoginBtn").addEventListener("click", async () => {
-        try {
-          await signInWithEmailAndPassword(auth, document.getElementById("authEmail").value, document.getElementById("authPass").value);
-          document.getElementById("appModal").classList.remove("open");
-        } catch (e) { alert(e.message); }
-      });
+    function clearAuthGateError() {
+      const errorBox = document.getElementById("authGateError");
+      errorBox.textContent = "";
+      errorBox.style.display = "none";
+    }
 
-      document.getElementById("emailSignupBtn").addEventListener("click", async () => {
-        try {
-          const cred = await createUserWithEmailAndPassword(auth, document.getElementById("authEmail").value, document.getElementById("authPass").value);
-          const name = document.getElementById("authName").value.trim();
-          if (name) await updateProfile(cred.user, { displayName: name });
-          document.getElementById("appModal").classList.remove("open");
-        } catch (e) { alert(e.message); }
-      });
+    function setAuthGateMode(mode) {
+      const isSignIn = mode === "signin";
+      document.getElementById("authGateSignInForm").hidden = !isSignIn;
+      document.getElementById("authGateCreateForm").hidden = isSignIn;
+      document.getElementById("authGateSignInTab").classList.toggle("active", isSignIn);
+      document.getElementById("authGateCreateTab").classList.toggle("active", !isSignIn);
+      document.getElementById("authGateSignInTab").setAttribute("aria-selected", String(isSignIn));
+      document.getElementById("authGateCreateTab").setAttribute("aria-selected", String(!isSignIn));
+      clearAuthGateError();
+    }
 
-      document.getElementById("googleLoginBtn").addEventListener("click", async () => {
-        try {
-          await signInWithPopup(auth, new GoogleAuthProvider());
-          document.getElementById("appModal").classList.remove("open");
-        } catch (e) { alert(e.message); }
+    document.getElementById("authGateSignInTab").addEventListener("click", () => setAuthGateMode("signin"));
+    document.getElementById("authGateCreateTab").addEventListener("click", () => setAuthGateMode("create"));
+
+    document.querySelectorAll(".auth-password-toggle").forEach((button) => {
+      button.addEventListener("click", () => {
+        const passwordInput = document.getElementById(button.dataset.passwordTarget);
+        const showPassword = passwordInput.type === "password";
+        passwordInput.type = showPassword ? "text" : "password";
+        button.textContent = showPassword ? "Hide" : "Show";
+        button.setAttribute("aria-label", `${showPassword ? "Hide" : "Show"} password`);
       });
     });
 
-    if (isFirebaseConfigured) {
-      onAuthStateChanged(auth, (user) => {
+    document.getElementById("authGateSignInForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      clearAuthGateError();
+      if (!isFirebaseConfigured || !auth) {
+        showAuthGateError("Account sign-in is unavailable because Firebase is not configured.");
+        return;
+      }
+
+      const submitButton = document.getElementById("gateSignInBtn");
+      submitButton.disabled = true;
+      try {
+        await signInWithEmailAndPassword(
+          auth,
+          document.getElementById("gateSignInEmail").value.trim(),
+          document.getElementById("gateSignInPassword").value
+        );
+        document.getElementById("gateSignInPassword").value = "";
+      } catch (error) {
+        showAuthGateError(`Could not sign in: ${error.message}`);
+      } finally {
+        submitButton.disabled = false;
+      }
+    });
+
+    document.getElementById("gateGoogleSignInBtn").addEventListener("click", async () => {
+      clearAuthGateError();
+      if (!isFirebaseConfigured || !auth) {
+        showAuthGateError("Account sign-in is unavailable because Firebase is not configured.");
+        return;
+      }
+      const button = document.getElementById("gateGoogleSignInBtn");
+      button.disabled = true;
+      try {
+        await signInWithPopup(auth, new GoogleAuthProvider());
+      } catch (error) {
+        showAuthGateError(`Could not sign in with Google: ${error.message}`);
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    document.getElementById("authGateCreateForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      clearAuthGateError();
+      if (!isFirebaseConfigured || !auth || !db) {
+        showAuthGateError("Account creation is unavailable because Firebase is not configured.");
+        return;
+      }
+
+      const username = document.getElementById("gateRegUsername").value.trim();
+      const email = document.getElementById("gateRegEmail").value.trim();
+      const password = document.getElementById("gateRegPassword").value;
+      if (!username) {
+        showAuthGateError("Choose a username to create your account.");
+        return;
+      }
+
+      const submitButton = document.getElementById("gateCreateAccountBtn");
+      submitButton.disabled = true;
+      try {
+        const credential = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(credential.user, { displayName: username });
+        await setDoc(doc(db, "users", credential.user.uid, "profile", "info"), {
+          username,
+          displayName: username,
+          email: credential.user.email || email,
+          createdAt: serverTimestamp()
+        }, { merge: true });
+        await sendEmailVerification(credential.user);
+        document.getElementById("gateRegPassword").value = "";
+      } catch (error) {
+        if (auth.currentUser) {
+          alert(`Your account was created, but profile setup or verification email could not be completed: ${error.message}`);
+        } else {
+          showAuthGateError(`Could not create your account: ${error.message}`);
+        }
+      } finally {
+        submitButton.disabled = false;
+      }
+    });
+
+    document.getElementById("authBtn").addEventListener("click", async () => {
+      if (!currentUser) {
+        setAuthGateMode("signin");
+        return;
+      }
+      await openBelieverProfile();
+    });
+
+    let authTransitionId = 0;
+    if (isFirebaseConfigured && auth) {
+      onAuthStateChanged(auth, async (user) => {
+        const transitionId = ++authTransitionId;
+        const previousUserId = currentUser?.uid;
         currentUser = user;
+        const appShell = document.querySelector(".app-shell");
+        const authGate = document.getElementById("authGateScreen");
+        appShell.classList.toggle("authenticated", Boolean(user));
+        authGate.hidden = Boolean(user);
+
+        if (!user) {
+          clearSignedOutCaches(previousUserId);
+          agreedPrayerIds = [];
+          thanksgivingLog = {};
+          lovedVerses = new Map();
+          highlightedVerses = new Map();
+          temporaryBibleHighlights.clear();
+          cachedPosts = [];
+          allPodcastEpisodes = [];
+          renderAuthButton(null);
+          clearHousePrayerViews();
+          document.getElementById("blogList").replaceChildren();
+          document.getElementById("podcastList").replaceChildren();
+          document.getElementById("audioPlayer").pause();
+          document.getElementById("audioPlayer").removeAttribute("src");
+          document.getElementById("audioBar").classList.remove("visible");
+          document.getElementById("appModal").classList.remove("open");
+          document.getElementById("gloryCelebration").classList.remove("active");
+          return;
+        }
+
+        clearAuthGateError();
+        clearHousePrayerViews();
+        agreedPrayerIds = [];
+        thanksgivingLog = {};
         renderAuthButton(user);
-        loadHouseOfPrayer();
-        loadAudits();
+        renderLibrary();
+        if (!document.getElementById("bibleBookSelect").options.length) initializeBibleReader();
+        if (!currentBibleChapter) loadBibleChapter("GEN", 1);
+        const results = await Promise.allSettled([
+          loadHouseOfPrayer(),
+          loadAudits(),
+          loadPodcastRSS(),
+          loadWordPressPosts(),
+          loadSavedScriptures(user.uid)
+        ]);
+        if (transitionId !== authTransitionId || currentUser?.uid !== user.uid) return;
+        const failures = results.filter((result) => result.status === "rejected");
+        if (failures.length) {
+          alert(`Some account data could not be loaded: ${failures.map((result) => result.reason?.message || "Unknown error").join("; ")}`);
+        }
       });
+    } else {
+      showAuthGateError("The account service is not configured. Please contact the app administrator.");
     }
 
     async function openEnduranceReflectionModal(petition, daysOnAltar) {
@@ -2297,6 +3284,7 @@
       `);
 
       document.getElementById("saveEnduranceStepBtn").addEventListener("click", async () => {
+        if (!requireAuthenticatedUser()) return;
         const feelings = document.getElementById("endureFeelings").value.trim();
         const standing = document.getElementById("endureStanding").value.trim();
         if (!feelings && !standing) {
@@ -2315,22 +3303,18 @@
         const updatedJourney = [...existingJourney, newStep];
         const milestoneMark = daysOnAltar >= 90 ? 90 : 60;
 
-        if (isFirebaseConfigured && currentUser) {
+        try {
           await updateDoc(doc(db, "users", currentUser.uid, "petitions", petition.id), {
             journeyLog: updatedJourney,
             lastEnduranceCheckDays: milestoneMark
           });
-        } else {
-          localPetitions = localPetitions.map((item) =>
-            item.id === petition.id
-              ? { ...item, journeyLog: updatedJourney, lastEnduranceCheckDays: milestoneMark }
-              : item
-          );
-          localStorage.setItem("smsf_petitions", JSON.stringify(localPetitions));
+        } catch (error) {
+          alert(`Could not save your growth step: ${error.message}`);
+          return;
         }
 
         document.getElementById("appModal").classList.remove("open");
-        loadHouseOfPrayer();
+        await loadHouseOfPrayer();
       });
     }
 
@@ -2339,11 +3323,6 @@
       navigator.serviceWorker.register("/sw.js").catch(() => {});
     }
 
-    renderLibrary();
-    loadWordPressPosts();
-    loadPodcastRSS();
-    loadHouseOfPrayer();
-    loadAudits();
   </script>
 </body>
 </html>
