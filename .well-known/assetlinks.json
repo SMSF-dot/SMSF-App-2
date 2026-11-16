@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "org.sinceremilksolidfood.app.twa",
+        "sha256_cert_fingerprints": ["DF:FF:E0:0F:6D:11:0C:28:15:DF:D4:54:C9:2F:EC:53:47:E0:52:5C:38:9B:CC:32:82:DC:E9:70:E0:D6:D6:87"]
+      }
+    }]
