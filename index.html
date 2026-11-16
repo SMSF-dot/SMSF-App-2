@@ -1122,6 +1122,9 @@
         </div>
         <p id="bibleReaderStatus" style="font-size:12px; color:var(--ink-muted); margin-bottom:8px;" aria-live="polite"></p>
         <div id="bibleChapterContent" aria-live="polite"></div>
+        <div class="bible-reader-controls" style="grid-template-columns:1fr; margin-top:12px;">
+          <button id="bibleNextChapterBottomBtn" class="btn btn-outline btn-sm" type="button">Next Chapter &rarr;</button>
+        </div>
         <p style="font-size:10px; color:var(--ink-muted); margin-top:14px;">Berean Standard Bible · Public domain · bible.helloao.org</p>
       </div>
       <div id="bibleSavedContainer" hidden></div>
@@ -1892,6 +1895,116 @@
       }
     }
 
+    function openPostReader(post) {
+      if (!post) return;
+
+      const postTitle = ministryDisplayText(post.title?.rendered) || "Teaching";
+      openModal("Teaching", postTitle, `
+        ${post.content?.rendered || ""}
+        <section style="background:var(--cream-card); border:1px solid var(--border); border-radius:14px; padding:16px; margin-top:22px;">
+          <h3 style="font-size:20px; color:var(--sage-deep); margin-bottom:4px;">Comments &amp; Questions</h3>
+          <p style="font-size:13px; color:var(--ink-muted); margin-bottom:12px;">Share a comment, reflection, or question about this teaching.</p>
+          <div class="field">
+            <label for="postFeedbackType">Submission Type</label>
+            <select id="postFeedbackType">
+              <option value="reflection">Share a Reflection / Comment</option>
+              <option value="question">Ask a Question</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="postFeedbackName">${currentUser ? "Authenticated Username" : "Name (optional)"}</label>
+            <input id="postFeedbackName" type="text" ${currentUser ? "readonly" : ""} />
+          </div>
+          <div class="field">
+            <label for="postFeedbackMessage">Your Reflection or Question</label>
+            <textarea id="postFeedbackMessage" placeholder="Write your message..." rows="4"></textarea>
+          </div>
+          <button id="submitPostFeedbackBtn" class="btn btn-primary" type="button">Add a Comment</button>
+          <div id="postFeedbackConfirmation" role="status" style="display:none; background:var(--sage-tint); color:var(--sage-deep); border:1px solid var(--sage); border-radius:10px; padding:10px 12px; margin-top:12px; font-size:13px;">Your message has been received. Thank you for engaging with the Word.</div>
+          <div id="postFeedbackSyncNotice" role="alert" data-post-id="${escapeHTML(post.id)}" style="display:none; background:var(--gold-tint); color:var(--gold-deep); border-radius:10px; padding:10px 12px; margin-top:10px; font-size:12px;"></div>
+          <div id="postFeedbackList" data-post-id="${escapeHTML(post.id)}" style="margin-top:14px;"></div>
+        </section>
+      `);
+
+      const nameInput = document.getElementById("postFeedbackName");
+      const messageInput = document.getElementById("postFeedbackMessage");
+      const submitButton = document.getElementById("submitPostFeedbackBtn");
+      nameInput.value = currentUser?.displayName || currentUser?.email?.split("@")[0] || "";
+      loadPostFeedback(post);
+
+      submitButton.addEventListener("click", async () => {
+        const message = messageInput.value.trim();
+        if (!message) {
+          alert("Write a reflection or question before submitting.");
+          return;
+        }
+
+        const type = document.getElementById("postFeedbackType").value;
+        const user = currentUser;
+        const authorName = user
+          ? user.displayName?.trim() || user.email?.split("@")[0] || "Believer"
+          : nameInput.value.trim() || "Guest";
+        const userId = user?.uid || "guest";
+        const feedbackId = `feedback-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        const localEntry = {
+          id: feedbackId,
+          postId: post.id,
+          postTitle,
+          type,
+          authorName,
+          message,
+          userId,
+          createdAt: Date.now()
+        };
+
+        submitButton.disabled = true;
+        try {
+          localStorage.setItem("smsf_post_feedback", JSON.stringify([
+            localEntry,
+            ...getLocalPostFeedback()
+          ]));
+        } catch (error) {
+          alert(`Could not save your message on this device: ${error.message}`);
+          submitButton.disabled = false;
+          return;
+        }
+
+        document.getElementById("postFeedbackConfirmation").style.display = "block";
+        messageInput.value = "";
+        renderPostFeedback(post.id);
+
+        if (isFirebaseConfigured && db) {
+          try {
+            const feedbackDoc = await addDoc(collection(db, "post_feedback"), {
+              postId: post.id,
+              postTitle,
+              type,
+              authorName,
+              message,
+              userId,
+              createdAt: serverTimestamp()
+            });
+            const updatedLocalFeedback = getLocalPostFeedback().map((entry) =>
+              entry.id === feedbackId ? { ...entry, firestoreId: feedbackDoc.id } : entry
+            );
+            try {
+              localStorage.setItem("smsf_post_feedback", JSON.stringify(updatedLocalFeedback));
+            } catch (error) {
+              console.warn("The feedback was saved online but its local sync marker could not be updated.", error);
+            }
+            renderPostFeedback(post.id, [{ ...localEntry, firestoreId: feedbackDoc.id }]);
+          } catch (error) {
+            const syncNotice = document.getElementById("postFeedbackSyncNotice");
+            if (syncNotice?.dataset.postId === String(post.id)) {
+              syncNotice.textContent = `Your message is saved on this device, but could not be synced online: ${error.message}`;
+              syncNotice.style.display = "block";
+            }
+          }
+        }
+        submitButton.disabled = false;
+      });
+    }
+
     function renderPosts(posts) {
       const blogList = document.getElementById("blogList");
       if (!posts.length) {
@@ -1914,109 +2027,7 @@
 
       document.querySelectorAll(".read-post-btn").forEach((btn) => {
         btn.addEventListener("click", () => {
-          const post = posts[Number(btn.dataset.idx)];
-          if (!post) return;
-
-          openModal("Teaching", post.title.rendered, `
-            ${post.content.rendered}
-            <section style="background:var(--cream-card); border:1px solid var(--border); border-radius:14px; padding:16px; margin-top:22px;">
-              <h3 style="font-size:20px; color:var(--sage-deep); margin-bottom:4px;">Reflections &amp; Questions</h3>
-              <p style="font-size:13px; color:var(--ink-muted); margin-bottom:12px;">Share what stood out or ask a question about this teaching.</p>
-              <div class="field">
-                <label for="postFeedbackType">Submission Type</label>
-                <select id="postFeedbackType">
-                  <option value="reflection">Share a Reflection / Comment</option>
-                  <option value="question">Ask a Question</option>
-                </select>
-              </div>
-              <div class="field">
-                <label for="postFeedbackName">${currentUser ? "Name" : "Name (optional)"}</label>
-                <input id="postFeedbackName" type="text" />
-              </div>
-              <div class="field">
-                <label for="postFeedbackMessage">Your Reflection or Question</label>
-                <textarea id="postFeedbackMessage" placeholder="Write your message..." rows="4"></textarea>
-              </div>
-              <button id="submitPostFeedbackBtn" class="btn btn-primary" type="button">Submit</button>
-              <div id="postFeedbackConfirmation" role="status" style="display:none; background:var(--sage-tint); color:var(--sage-deep); border:1px solid var(--sage); border-radius:10px; padding:10px 12px; margin-top:12px; font-size:13px;">Your message has been received. Thank you for engaging with the Word.</div>
-              <div id="postFeedbackSyncNotice" role="alert" data-post-id="${escapeHTML(post.id)}" style="display:none; background:var(--gold-tint); color:var(--gold-deep); border-radius:10px; padding:10px 12px; margin-top:10px; font-size:12px;"></div>
-              <div id="postFeedbackList" data-post-id="${escapeHTML(post.id)}" style="margin-top:14px;"></div>
-            </section>
-          `);
-
-          const nameInput = document.getElementById("postFeedbackName");
-          const messageInput = document.getElementById("postFeedbackMessage");
-          const submitButton = document.getElementById("submitPostFeedbackBtn");
-          nameInput.value = currentUser?.displayName || "";
-          loadPostFeedback(post);
-
-          submitButton.addEventListener("click", async () => {
-            const message = messageInput.value.trim();
-            if (!message) {
-              alert("Write a reflection or question before submitting.");
-              return;
-            }
-
-            const type = document.getElementById("postFeedbackType").value;
-            const authorName = nameInput.value.trim() || "Guest";
-            const feedbackId = `feedback-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-            const localEntry = {
-              id: feedbackId,
-              postId: post.id,
-              postTitle: post.title.rendered,
-              type,
-              authorName,
-              message,
-              userId: currentUser?.uid || "guest",
-              createdAt: Date.now()
-            };
-
-            submitButton.disabled = true;
-            try {
-              localStorage.setItem("smsf_post_feedback", JSON.stringify([
-                localEntry,
-                ...getLocalPostFeedback()
-              ]));
-            } catch (error) {
-              alert(`Could not save your message on this device: ${error.message}`);
-              submitButton.disabled = false;
-              return;
-            }
-
-            document.getElementById("postFeedbackConfirmation").style.display = "block";
-            messageInput.value = "";
-            renderPostFeedback(post.id);
-
-            if (isFirebaseConfigured && db) {
-              try {
-                const feedbackDoc = await addDoc(collection(db, "post_feedback"), {
-                  postId: post.id,
-                  postTitle: post.title.rendered,
-                  type,
-                  authorName,
-                  message,
-                  userId: currentUser?.uid || "guest",
-                  createdAt: serverTimestamp()
-                });
-                const updatedLocalFeedback = getLocalPostFeedback().map((entry) =>
-                  entry.id === feedbackId ? { ...entry, firestoreId: feedbackDoc.id } : entry
-                );
-                try {
-                  localStorage.setItem("smsf_post_feedback", JSON.stringify(updatedLocalFeedback));
-                } catch (error) {
-                  console.warn("The feedback was saved online but its local sync marker could not be updated.", error);
-                }
-                renderPostFeedback(post.id, [{ ...localEntry, firestoreId: feedbackDoc.id }]);
-              } catch (error) {
-                const syncNotice = document.getElementById("postFeedbackSyncNotice");
-                if (syncNotice?.dataset.postId === String(post.id)) {
-                  syncNotice.textContent = `Your message is saved on this device, but could not be synced online: ${error.message}`;
-                  syncNotice.style.display = "block";
-                }
-              }
-            }
-            submitButton.disabled = false;
-          });
+          openPostReader(posts[Number(btn.dataset.idx)]);
         });
       });
     }
@@ -2597,7 +2608,13 @@
     }
 
     document.querySelectorAll(".nav-item").forEach((btn) => {
-      btn.addEventListener("click", () => switchScreen(btn.dataset.screen));
+      btn.addEventListener("click", () => {
+        switchScreen(btn.dataset.screen);
+        if (btn.dataset.screen === "bible") {
+          document.getElementById("bibleReader").scrollTo({ top: 0, behavior: "smooth" });
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      });
     });
 
     document.querySelectorAll(".chamber-btn").forEach((btn) => {
@@ -2863,6 +2880,7 @@
       chapterSelect.value = String(chapterNumber);
       document.getElementById("biblePreviousChapterBtn").disabled = chapterNumber === 1;
       document.getElementById("bibleNextChapterBtn").disabled = chapterNumber === book.chapters;
+      document.getElementById("bibleNextChapterBottomBtn").disabled = chapterNumber === book.chapters;
       status.textContent = `Loading ${book.name} ${chapterNumber}...`;
       container.replaceChildren();
 
@@ -2908,6 +2926,9 @@
         if (currentBibleChapter && currentBibleChapter.chapterNumber < BIBLE_BOOK_BY_CODE.get(currentBibleChapter.bookCode).chapters) {
           loadBibleChapter(currentBibleChapter.bookCode, currentBibleChapter.chapterNumber + 1);
         }
+      });
+      document.getElementById("bibleNextChapterBottomBtn").addEventListener("click", () => {
+        document.getElementById("bibleNextChapterBtn").click();
       });
       document.querySelectorAll(".bible-mode-btn").forEach((button) => {
         button.addEventListener("click", () => {
@@ -3241,7 +3262,7 @@
         document.getElementById("deepStudyActionBtn").addEventListener("click", () => {
           document.getElementById("appModal").classList.remove("open");
           if (related.type === "post") {
-            openModal("Teaching", ministryDisplayText(related.item.title?.rendered) || "Teaching", related.item.content?.rendered || "");
+            openPostReader(related.item);
             return;
           }
           switchScreen("listen");
