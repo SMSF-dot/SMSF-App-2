@@ -182,21 +182,6 @@
       overflow: hidden;
     }
 
-    .altar-flame {
-      width: 28px;
-      height: 38px;
-      margin: 0 auto 6px;
-      background: radial-gradient(circle at 50% 75%, #FFF3B0 0%, #F4A226 55%, #C85A17 100%);
-      border-radius: 50% 50% 50% 50% / 65% 65% 35% 35%;
-      box-shadow: 0 0 24px rgba(244, 162, 38, 0.85);
-      animation: flicker 2.2s infinite alternate ease-in-out;
-    }
-
-    @keyframes flicker {
-      0% { transform: scale(1) rotate(-1deg); opacity: 0.92; }
-      100% { transform: scale(1.08, 1.14) rotate(1.5deg); opacity: 1; }
-    }
-
     .altar-stone {
       width: 210px;
       height: 46px;
@@ -572,7 +557,12 @@
 
       <!-- Visual Altar Header -->
       <div class="altar-sanctuary">
-        <div class="altar-flame" title="The fire on the altar shall not go out"></div>
+        <div style="display:inline-flex; align-items:center; justify-content:center; width:54px; height:54px; border-radius:50%; background:radial-gradient(circle, rgba(197,155,56,0.22) 0%, rgba(197,155,56,0) 72%); margin-bottom:6px;">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 0 8px rgba(197,155,56,0.55));">
+            <path d="M12 2.5c1.8 2.8 4.8 5.2 4.8 9.2a4.8 4.8 0 1 1-9.6 0c0-1.6.7-3.1 1.7-4.4.2 1.2 1 2 2 2-.4-2.3.1-4.8 1.1-6.8Z"/>
+            <path d="M12 16.5a2 2 0 0 0 2-2c0-1.1-.8-2-2-3.2-1.2 1.2-2 2.1-2 3.2a2 2 0 0 0 2 2Z" stroke-width="1.4"/>
+          </svg>
+        </div>
         <div class="altar-stone">Altar of Petitions</div>
         <div class="altar-stats">
           <div><strong id="activeCount">0</strong>On the Altar</div>
@@ -1961,6 +1951,18 @@
       element.textContent = displayName.trim().charAt(0).toUpperCase() || "B";
     }
 
+    function getSavedProfile(user) {
+      try {
+        const savedProfile = JSON.parse(localStorage.getItem(`smsf_profile_${user.uid}`) || "{}");
+        return savedProfile && typeof savedProfile === "object" && !Array.isArray(savedProfile)
+          ? savedProfile
+          : {};
+      } catch (error) {
+        console.warn("Could not read the locally saved believer profile.", error);
+        return {};
+      }
+    }
+
     function renderAuthButton(user) {
       const authBtn = document.getElementById("authBtn");
       authBtn.replaceChildren();
@@ -1979,28 +1981,49 @@
       authBtn.style.gap = "8px";
 
       const avatar = document.createElement("span");
-      renderProfileAvatar(avatar, user.photoURL || "", firstName, 28);
+      const savedProfile = getSavedProfile(user);
+      const savedPhoto = savedProfile.customPhoto || user.photoURL || "";
+      renderProfileAvatar(avatar, savedPhoto, firstName, 28);
       const name = document.createElement("span");
       name.textContent = firstName;
       authBtn.appendChild(avatar);
       authBtn.appendChild(name);
+
+      if (!savedPhoto && isFirebaseConfigured && db) {
+        getDoc(doc(db, "users", user.uid, "profile", "info")).then((profileSnap) => {
+          if (!profileSnap.exists() || currentUser?.uid !== user.uid) return;
+          const customPhoto = profileSnap.data().customPhoto;
+          if (typeof customPhoto === "string" && customPhoto) {
+            renderProfileAvatar(avatar, customPhoto, firstName, 28);
+          }
+        }).catch((error) => console.warn("Could not load the saved believer profile photo.", error));
+      }
     }
 
     async function openBelieverProfile() {
       if (!currentUser) return;
 
       const profileKey = `smsf_profile_${currentUser.uid}`;
-      let profileData = {};
-      try {
-        if (isFirebaseConfigured && db) {
+      const localProfile = getSavedProfile(currentUser);
+      let profileData = { ...localProfile };
+      if (isFirebaseConfigured && db) {
+        try {
           const profileSnap = await getDoc(doc(db, "users", currentUser.uid, "profile", "info"));
-          if (profileSnap.exists()) profileData = profileSnap.data();
-        } else {
-          profileData = JSON.parse(localStorage.getItem(profileKey) || "{}");
+          if (profileSnap.exists()) {
+            const cloudProfile = profileSnap.data();
+            profileData = {
+              ...profileData,
+              ...cloudProfile,
+              customPhoto: localProfile.customPhoto || cloudProfile.customPhoto || ""
+            };
+          }
+        } catch (error) {
+          if (!Object.keys(localProfile).length) {
+            alert(`Could not load your profile: ${error.message}`);
+            return;
+          }
+          alert(`Could not load your cloud profile; showing your locally saved profile instead: ${error.message}`);
         }
-      } catch (error) {
-        alert(`Could not load your profile: ${error.message}`);
-        return;
       }
 
       const displayName = profileData.displayName || currentUser.displayName || currentUser.email?.split("@")[0] || "";
@@ -2021,21 +2044,22 @@
           <input id="profileDisplayName" type="text" placeholder="Your name" />
         </div>
         <div class="field">
-          <label for="profileBio">Personal Faith Bio</label>
+          <label for="profileBio">Personal Faith Declaration / Bio</label>
           <textarea id="profileBio" placeholder="e.g., I am sold out to Jesus Christ!"></textarea>
         </div>
         <div class="field">
-          <label for="profileLocation">Location / City</label>
+          <label for="profileLocation">City / Location</label>
           <input id="profileLocation" type="text" placeholder="e.g., London" />
         </div>
+        <div style="font-size:10px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold-deep); margin-bottom:6px;">Kingdom Ledger</div>
         <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; text-align:center; margin:14px 0;">
           <div style="background:var(--sage-tint); padding:10px 4px; border-radius:10px;">
             <strong id="profileActiveCount" style="display:block; font-size:20px; color:var(--sage-deep);">0</strong>
-            <span style="font-size:10px;">Active Petitions</span>
+            <span style="font-size:10px;">Active Petitions on the Altar</span>
           </div>
           <div style="background:var(--gold-tint); padding:10px 4px; border-radius:10px;">
             <strong id="profileMemorialCount" style="display:block; font-size:20px; color:var(--gold-deep);">0</strong>
-            <span style="font-size:10px;">Memorial Stones</span>
+            <span style="font-size:10px;">Memorial Stones Raised</span>
           </div>
           <div style="background:var(--sage-tint); padding:10px 4px; border-radius:10px;">
             <strong id="profileAuditCount" style="display:block; font-size:20px; color:var(--sage-deep);">0</strong>
@@ -2043,7 +2067,7 @@
           </div>
         </div>
         <div style="display:grid; gap:8px;">
-          <button id="saveProfileBtn" class="btn btn-primary" type="button">Save Profile</button>
+          <button id="saveProfileBtn" class="btn btn-primary" type="button">Save Profile Details</button>
           <button id="profileSignOutBtn" class="btn btn-outline" type="button">Sign Out</button>
         </div>
       `);
@@ -2052,8 +2076,8 @@
       renderProfileAvatar(photoPreview, customPhoto, displayName || "Believer", 88);
       document.getElementById("profileEmail").textContent = currentUser.email || "Not provided";
       document.getElementById("profileDisplayName").value = displayName;
-      document.getElementById("profileBio").value = profileData.bio || "";
-      document.getElementById("profileLocation").value = profileData.location || "";
+      document.getElementById("profileBio").value = profileData.bio || "I am sold out to Jesus Christ!";
+      document.getElementById("profileLocation").value = profileData.location || "London";
       document.getElementById("profilePhotoUrl").value = customPhoto.startsWith("data:") ? "" : customPhoto;
       document.getElementById("profileActiveCount").textContent = document.getElementById("activeCount").textContent || "0";
       document.getElementById("profileMemorialCount").textContent = document.getElementById("answeredCount").textContent || "0";
@@ -2120,11 +2144,13 @@
         };
 
         try {
+          localStorage.setItem(profileKey, JSON.stringify(updatedProfile));
           if (isFirebaseConfigured && currentUser) {
             await updateProfile(currentUser, { displayName: newDisplayName });
-            await setDoc(doc(db, "users", currentUser.uid, "profile", "info"), updatedProfile, { merge: true });
-          } else {
-            localStorage.setItem(profileKey, JSON.stringify(updatedProfile));
+            await setDoc(doc(db, "users", currentUser.uid, "profile", "info"), {
+              bio: updatedProfile.bio,
+              location: updatedProfile.location
+            }, { merge: true });
           }
           renderAuthButton(currentUser);
           document.getElementById("appModal").classList.remove("open");
