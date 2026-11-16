@@ -418,6 +418,11 @@
         <a href="https://podcasts.apple.com/gb/podcast/sincere-milk-solid-food/id1889851727" target="_blank" class="chip">Apple Podcasts</a>
         <a href="https://youtube.com/@sinceremilksolidfoodpodcast" target="_blank" class="chip">YouTube</a>
       </div>
+      <div id="seriesFilterChips" class="chips">
+        <button class="chip active" data-series="all" type="button">All Episodes</button>
+        <button class="chip" data-series="smsf" type="button">Sincere Milk &amp; Solid Food</button>
+        <button class="chip" data-series="proverbs31" type="button">31 Days in Proverbs 31</button>
+      </div>
       <div id="podcastList">
         <div class="card"><p style="font-size:13px;color:var(--ink-muted);">Loading latest episodes from your RSS feed...</p></div>
       </div>
@@ -789,6 +794,8 @@
       });
     }
 
+    let allPodcastEpisodes = [];
+
     async function loadPodcastRSS() {
       const podList = document.getElementById("podcastList");
       try {
@@ -796,30 +803,65 @@
         const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`);
         const data = await res.json();
         const items = data.items || [];
-        podList.innerHTML = items.slice(0, 15).map((ep, i) => `
-          <div class="card">
-            <span class="badge">Episode</span>
-            <h3 style="font-size:20px; margin-bottom:6px;">${ep.title}</h3>
-            <p style="font-size:12px; color:var(--ink-muted); margin-bottom:10px;">${new Date(ep.pubDate).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</p>
-            <button class="btn btn-primary btn-sm play-ep-btn" data-audio="${ep.enclosure?.link || ""}" data-title="${ep.title.replace(/"/g, "&quot;")}" type="button">&#9654; Play Episode</button>
-          </div>
-        `).join("");
 
-        document.querySelectorAll(".play-ep-btn").forEach((btn) => {
-          btn.addEventListener("click", () => {
-            const src = btn.dataset.audio;
-            if (!src) return;
-            const player = document.getElementById("audioPlayer");
-            document.getElementById("audioTitle").textContent = btn.dataset.title;
-            document.getElementById("audioBar").classList.add("visible");
-            player.src = src;
-            player.play();
-          });
+        allPodcastEpisodes = items.map((ep) => {
+          const text = `${ep.title} ${ep.description || ""}`.toLowerCase();
+          const isProverbs = text.includes("proverbs 31") || text.includes("day ");
+          return {
+            title: ep.title,
+            pubDate: ep.pubDate,
+            audioUrl: ep.enclosure?.link || "",
+            series: isProverbs ? "proverbs31" : "smsf",
+            seriesLabel: isProverbs ? "31 Days in Proverbs 31" : "Sincere Milk & Solid Food"
+          };
         });
+
+        renderPodcastEpisodes("all");
       } catch (err) {
         podList.innerHTML = `<div class="card"><p style="font-size:13px;">Listen directly on <a href="https://open.spotify.com/show/4zRBHR5asDACkgwGqMygpn" target="_blank">Spotify</a> or <a href="https://sinceremilksolidfood.org/ssp-podcast-archive/" target="_blank">sinceremilksolidfood.org</a>.</p></div>`;
       }
     }
+
+    function renderPodcastEpisodes(seriesFilter) {
+      const podList = document.getElementById("podcastList");
+      const filtered = seriesFilter === "all"
+        ? allPodcastEpisodes
+        : allPodcastEpisodes.filter((ep) => ep.series === seriesFilter);
+
+      if (!filtered.length) {
+        podList.innerHTML = `<div class="card"><p style="font-size:13px; color:var(--ink-muted);">No episodes found in this series yet.</p></div>`;
+        return;
+      }
+
+      podList.innerHTML = filtered.map((ep) => `
+        <div class="card">
+          <span class="badge">${ep.seriesLabel}</span>
+          <h3 style="font-size:20px; margin-bottom:6px;">${ep.title}</h3>
+          <p style="font-size:12px; color:var(--ink-muted); margin-bottom:10px;">${new Date(ep.pubDate).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</p>
+          <button class="btn btn-primary btn-sm play-ep-btn" data-audio="${ep.audioUrl}" data-title="${ep.title.replace(/"/g, "&quot;")}" type="button">&#9654; Play Episode</button>
+        </div>
+      `).join("");
+
+      document.querySelectorAll(".play-ep-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const src = btn.dataset.audio;
+          if (!src) return;
+          const player = document.getElementById("audioPlayer");
+          document.getElementById("audioTitle").textContent = btn.dataset.title;
+          document.getElementById("audioBar").classList.add("visible");
+          player.src = src;
+          player.play();
+        });
+      });
+    }
+
+    document.querySelectorAll("#seriesFilterChips .chip").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        document.querySelectorAll("#seriesFilterChips .chip").forEach((c) => c.classList.remove("active"));
+        chip.classList.add("active");
+        renderPodcastEpisodes(chip.dataset.series);
+      });
+    });
 
     // =========================================================================
     // 4. HOUSE OF PRAYER & SOUL AUDITS (CLOUD + LOCAL FALLBACK)
