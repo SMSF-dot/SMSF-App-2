@@ -861,10 +861,20 @@
     async function loadWordPressPosts() {
       const blogList = document.getElementById("blogList");
       try {
-        const res = await fetch("https://sinceremilksolidfood.org/wp-json/wp/v2/posts?per_page=20&_embed");
-        const posts = await res.json();
-        cachedPosts = posts;
-        renderPosts(posts);
+        const postsUrl = "https://sinceremilksolidfood.org/wp-json/wp/v2/posts?per_page=100&_embed";
+        const res = await fetch(postsUrl);
+        if (!res.ok) throw new Error(`WordPress request failed: ${res.status}`);
+        const firstPagePosts = await res.json();
+        const totalPages = Number.parseInt(res.headers.get("X-WP-TotalPages") || "1", 10) || 1;
+        const remainingPages = await Promise.all(
+          Array.from({ length: Math.max(0, totalPages - 1) }, async (_, index) => {
+            const pageRes = await fetch(`${postsUrl}&page=${index + 2}`);
+            if (!pageRes.ok) throw new Error(`WordPress page request failed: ${pageRes.status}`);
+            return pageRes.json();
+          })
+        );
+        cachedPosts = [firstPagePosts, ...remainingPages].flat();
+        renderPosts(cachedPosts);
       } catch (err) {
         blogList.innerHTML = `<div class="card"><p style="font-size:13px;">Could not reach live feed right now. Visit <a href="https://sinceremilksolidfood.org/blog/" target="_blank">sinceremilksolidfood.org/blog</a>.</p></div>`;
       }
@@ -1439,9 +1449,23 @@
           renderPosts(cachedPosts);
           return;
         }
-        const filtered = cachedPosts.filter((p) => {
-          const terms = p._embedded?.["wp:term"]?.[0] || [];
-          return terms.some((t) => t.slug.includes(slug) || t.name.toLowerCase().includes(slug.replace("-", " ")));
+        const keywordMap = {
+          "nursery": ["nursery"],
+          "transition": ["transition"],
+          "solid-food": ["solid-food", "solid food"],
+          "soul-audit": ["soul-audit", "soul audit"],
+          "courtroom": ["courtroom"],
+          "legislative": ["legislative"]
+        };
+        const keywords = keywordMap[slug] || [];
+        const filtered = cachedPosts.filter((post) => {
+          const terms = (post._embedded?.["wp:term"] || []).flat()
+            .filter((term) => term.taxonomy === "category");
+          return terms.some((term) => {
+            const termSlug = (term.slug || "").toLowerCase();
+            const termName = (term.name || "").toLowerCase();
+            return keywords.some((keyword) => termSlug.includes(keyword) || termName.includes(keyword));
+          });
         });
         renderPosts(filtered);
       });
