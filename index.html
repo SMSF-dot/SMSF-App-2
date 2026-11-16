@@ -1007,9 +1007,37 @@
         alert(`You have already offered a prayer of thanksgiving today for "${prayerTitle}". Keep standing in faith!`);
         return;
       }
-      thanksgivingLog[prayerId] = { count: entry.count + 1, lastDate: today };
-      localStorage.setItem("smsf_thanksgiving_log", JSON.stringify(thanksgivingLog));
-      loadHouseOfPrayer();
+
+      openModal("Daily Thanksgiving Watch • 2 Corinthians 9:8", "Offer a Prayer of Thanksgiving", `
+        <p style="font-size:13px; color:var(--ink-muted); margin-bottom:14px;">
+          Choose to pray the inbuilt faith declaration below over <strong>"${prayerTitle}"</strong>, or write your own personal prayer of thanksgiving:
+        </p>
+
+        <div style="background:var(--gold-tint); border:1.5px solid var(--gold); border-radius:12px; padding:14px; margin-bottom:14px;">
+          <div style="font-size:10px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold-deep); margin-bottom:6px;">
+            Inbuilt Thanksgiving Prayer
+          </div>
+          <p class="serif" style="font-size:19px; font-weight:600; line-height:1.4; color:var(--charcoal);">
+            &ldquo;Lord, I thank You that You are making every good thing abound towards me today, and that whatever is in <strong>${prayerTitle}</strong> is abounding towards me today. In Jesus&rsquo; name I pray, Amen.&rdquo;
+          </p>
+        </div>
+
+        <div class="field">
+          <label>Or Pray in Your Own Words (Optional)</label>
+          <textarea id="customThanksText" placeholder="Write your own prayer of thanksgiving and faith here if you prefer..."></textarea>
+        </div>
+
+        <button id="confirmThanksSeedBtn" class="btn btn-gold" type="button">
+          Amen &mdash; Seal Today&rsquo;s Thanksgiving Seed
+        </button>
+      `);
+
+      document.getElementById("confirmThanksSeedBtn").addEventListener("click", () => {
+        thanksgivingLog[prayerId] = { count: entry.count + 1, lastDate: today };
+        localStorage.setItem("smsf_thanksgiving_log", JSON.stringify(thanksgivingLog));
+        document.getElementById("appModal").classList.remove("open");
+        loadHouseOfPrayer();
+      });
     }
 
     async function loadHouseOfPrayer() {
