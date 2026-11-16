@@ -309,7 +309,7 @@
     /* Audio Bar */
     .audio-bar {
       position: fixed;
-      bottom: 66px;
+      bottom: calc(90px + env(safe-area-inset-bottom));
       left: 50%;
       transform: translateX(-50%);
       width: 100%;
@@ -326,37 +326,65 @@
     }
     .audio-bar.visible { display: flex; }
 
-    /* Bottom Navigation */
+    /* Bottom Navigation — Frosted-Glass Floating Dock */
     .bottom-nav {
       position: fixed;
-      bottom: 0;
+      bottom: calc(12px + env(safe-area-inset-bottom));
       left: 50%;
       transform: translateX(-50%);
-      width: 100%;
-      max-width: 480px;
-      height: 66px;
-      background: #FFFFFF;
-      border-top: 1px solid var(--border);
+      width: calc(100% - 28px);
+      max-width: 448px;
+      height: 68px;
+      background: rgba(250, 247, 242, 0.86);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(197, 155, 56, 0.35);
+      border-radius: 28px;
+      box-shadow: 0 12px 32px rgba(22, 24, 23, 0.14);
       display: grid;
       grid-template-columns: repeat(5, 1fr);
+      padding: 6px;
+      gap: 4px;
       z-index: 40;
     }
 
     .nav-item {
       border: none;
       background: transparent;
+      border-radius: 22px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 3px;
-      font-size: 11px;
+      font-family: inherit;
+      font-size: 10.5px;
       font-weight: 600;
       color: var(--ink-muted);
       cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease, transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    .nav-item.active { color: var(--sage-deep); font-weight: 700; }
-    .nav-icon { font-size: 18px; }
+
+    .nav-item svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      stroke-width: 1.85;
+      transition: stroke-width 0.2s ease, transform 0.2s ease;
+    }
+
+    .nav-item.active {
+      background: rgba(197, 155, 56, 0.16);
+      color: var(--charcoal);
+      font-weight: 700;
+      transform: translateY(-1px);
+    }
+
+    .nav-item.active svg {
+      stroke: var(--gold-deep);
+      stroke-width: 2.3;
+      transform: scale(1.06);
+    }
 
     /* Modal */
     .modal-backdrop {
@@ -708,11 +736,40 @@
 
     <!-- Bottom Tab Navigation -->
     <nav class="bottom-nav">
-      <button class="nav-item active" data-screen="listen" type="button"><span class="nav-icon">&#127911;</span>Listen</button>
-      <button class="nav-item" data-screen="read" type="button"><span class="nav-icon">&#128214;</span>Read</button>
-      <button class="nav-item" data-screen="pray" type="button"><span class="nav-icon">&#128293;</span>Pray</button>
-      <button class="nav-item" data-screen="journal" type="button"><span class="nav-icon">&#9997;</span>Journal</button>
-      <button class="nav-item" data-screen="library" type="button"><span class="nav-icon">&#128218;</span>Library</button>
+      <button class="nav-item active" data-screen="listen" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
+          <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
+        </svg>
+        <span>Listen</span>
+      </button>
+      <button class="nav-item" data-screen="read" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+        </svg>
+        <span>Read</span>
+      </button>
+      <button class="nav-item" data-screen="pray" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+        </svg>
+        <span>Pray</span>
+      </button>
+      <button class="nav-item" data-screen="journal" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 20h9" />
+          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+        </svg>
+        <span>Journal</span>
+      </button>
+      <button class="nav-item" data-screen="library" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+        </svg>
+        <span>Library</span>
+      </button>
     </nav>
   </div>
 
