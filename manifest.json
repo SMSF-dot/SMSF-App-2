@@ -1,24 +1,49 @@
 {
+  "id": "/",
   "name": "Sincere Milk & Solid Food",
   "short_name": "SMSF Ministry",
-  "description": "Moving Believers From the Nursery of Faith to Spiritual Responsibility. Listen, Read, Pray in the House of Prayer, and Audit Your Soul.",
+  "description": "Moving Believers from the Nursery of Faith to Spiritual Responsibility. Listen, Read, Pray in the House of Prayer, and Audit Your Soul.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#161817",
-  "theme_color": "#1E2A24",
   "orientation": "portrait",
+  "background_color": "#FAF8F5",
+  "theme_color": "#1E2220",
+  "categories": ["lifestyle", "books", "education"],
   "icons": [
     {
-      "src": "/icon-512.png",
+      "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "/icon-512.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot-mobile.png",
+      "sizes": "540x960",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "SMSF Ministry Mobile Experience"
+    },
+    {
+      "src": "screenshot-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "SMSF Ministry Desktop Dashboard"
     }
   ]
 }
