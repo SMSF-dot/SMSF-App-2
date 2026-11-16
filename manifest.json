@@ -1,0 +1,24 @@
+{
+  "name": "Sincere Milk & Solid Food",
+  "short_name": "SMSF Ministry",
+  "description": "Moving Believers From the Nursery of Faith to Spiritual Responsibility. Listen, Read, Pray in the House of Prayer, and Audit Your Soul.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#161817",
+  "theme_color": "#1E2A24",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

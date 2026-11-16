@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#1E2A24" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Sincere Milk &amp; Solid Food — House of Prayer &amp; Spiritual Governance</title>
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/icon-512.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --charcoal: #161817;
+      --charcoal-soft: #222624;
+      --sage: #3D5A4C;
+      --sage-deep: #24382E;
+      --sage-tint: #EDF2EF;
+      --cream: #FAF7F2;
+      --cream-card: #FFFFFF;
+      --gold: #C59B38;
+      --gold-deep: #96711D;
+      --gold-tint: #FBF6EA;
+      --ink: #1C1E1D;
+      --ink-muted: #5C635F;
+      --border: #E5DFD5;
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: #EAE5DC;
+      color: var(--ink);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 480px;
+      background: var(--cream);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+      padding-bottom: 92px;
+    }
+
+    h1, h2, h3, .serif { font-family: 'Cormorant Garamond', Georgia, serif; }
+
+    /* Top Header */
+    .top-bar {
+      background: linear-gradient(145deg, var(--charcoal) 0%, var(--sage-deep) 100%);
+      color: var(--cream);
+      padding: 20px 20px 18px;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      border-bottom: 2px solid rgba(197, 155, 56, 0.35);
+    }
+
+    .top-bar-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    .brand-title {
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.15;
+      color: #FFFFFF;
+    }
+
+    .auth-pill {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(197, 155, 56, 0.5);
+      color: var(--cream);
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Screens */
+    .screen { display: none; padding: 18px 18px 28px; animation: fadeIn 0.22s ease; }
+    .screen.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+    .section-header { margin-bottom: 16px; }
+    .section-header h2 { font-size: 28px; color: var(--charcoal); line-height: 1.1; }
+    .section-header p { font-size: 13px; color: var(--ink-muted); margin-top: 4px; line-height: 1.45; }
+
+    /* Cards & Buttons */
+    .card {
+      background: var(--cream-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 14px rgba(22, 24, 23, 0.04);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 13px 16px;
+      border-radius: 12px;
+      border: none;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.12s ease, opacity 0.15s ease;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: var(--sage); color: #FFFFFF; }
+    .btn-gold { background: linear-gradient(135deg, #C59B38, #A87E22); color: #FFFFFF; }
+    .btn-outline { background: transparent; border: 1.5px solid var(--sage); color: var(--sage); }
+    .btn-sm { padding: 8px 12px; font-size: 12px; width: auto; border-radius: 10px; }
+
+    /* House of Prayer Chambers */
+    .chamber-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      background: #ECE6DC;
+      padding: 5px;
+      border-radius: 14px;
+      margin-bottom: 16px;
+    }
+
+    .chamber-btn {
+      border: none;
+      background: transparent;
+      padding: 9px 6px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ink-muted);
+      cursor: pointer;
+      line-height: 1.25;
+      text-align: center;
+    }
+
+    .chamber-btn.active {
+      background: var(--charcoal);
+      color: #FFFFFF;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.14);
+    }
+
+    /* Altar Visual */
+    .altar-sanctuary {
+      background: radial-gradient(circle at top, #2D3D35 0%, #161817 100%);
+      border-radius: 20px;
+      padding: 20px 16px;
+      text-align: center;
+      color: var(--cream);
+      border: 1.5px solid rgba(197, 155, 56, 0.45);
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .altar-flame {
+      width: 28px;
+      height: 38px;
+      margin: 0 auto 6px;
+      background: radial-gradient(circle at 50% 75%, #FFF3B0 0%, #F4A226 55%, #C85A17 100%);
+      border-radius: 50% 50% 50% 50% / 65% 65% 35% 35%;
+      box-shadow: 0 0 24px rgba(244, 162, 38, 0.85);
+      animation: flicker 2.2s infinite alternate ease-in-out;
+    }
+
+    @keyframes flicker {
+      0% { transform: scale(1) rotate(-1deg); opacity: 0.92; }
+      100% { transform: scale(1.08, 1.14) rotate(1.5deg); opacity: 1; }
+    }
+
+    .altar-stone {
+      width: 210px;
+      height: 46px;
+      margin: 0 auto;
+      background: linear-gradient(180deg, #D9CBB5 0%, #B5A284 100%);
+      border-top: 4px solid var(--gold);
+      border-bottom: 5px solid #7E6D53;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--charcoal);
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.45);
+    }
+
+    .altar-stats {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 14px;
+      font-size: 12px;
+      color: #D8D3C8;
+    }
+    .altar-stats strong { color: var(--gold); font-size: 16px; display: block; }
+
+    /* Form Controls */
+    .field { margin-bottom: 12px; }
+    .field label { display: block; font-size: 12px; font-weight: 700; color: var(--charcoal); margin-bottom: 5px; }
+    .field input, .field select, .field textarea {
+      width: 100%;
+      padding: 11px 12px;
+      border-radius: 10px;
+      border: 1px solid #CFC7BA;
+      background: #FFFFFF;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--ink);
+    }
+    .field textarea { min-height: 82px; resize: vertical; }
+
+    .privacy-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .privacy-option {
+      border: 1.5px solid var(--border);
+      background: var(--cream);
+      padding: 10px;
+      border-radius: 12px;
+      text-align: left;
+      cursor: pointer;
+    }
+    .privacy-option.selected {
+      border-color: var(--gold);
+      background: var(--gold-tint);
+    }
+    .privacy-option strong { display: block; font-size: 12px; color: var(--charcoal); }
+    .privacy-option span { font-size: 11px; color: var(--ink-muted); }
+
+    /* Knowledge Match Box */
+    .knowledge-box {
+      background: var(--sage-tint);
+      border-left: 3.5px solid var(--sage);
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin-top: 10px;
+      font-size: 12px;
+    }
+    .knowledge-box strong { color: var(--sage-deep); display: block; margin-bottom: 3px; }
+
+    /* Memorial Stone Card */
+    .memorial-stone {
+      background: linear-gradient(145deg, #FFFDF8 0%, #F4EBD7 100%);
+      border: 1.5px solid var(--gold);
+      border-radius: 14px;
+      padding: 15px;
+      margin-bottom: 12px;
+    }
+
+    /* Filter Chips */
+    .chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+      scrollbar-width: none;
+    }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip {
+      white-space: nowrap;
+      padding: 7px 13px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #FFFFFF;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .chip.active { background: var(--sage); color: #FFFFFF; border-color: var(--sage); }
+
+    /* Audio Bar */
+    .audio-bar {
+      position: fixed;
+      bottom: 66px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      background: var(--charcoal);
+      color: #FFFFFF;
+      padding: 10px 16px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border-top: 1px solid rgba(197, 155, 56, 0.4);
+      z-index: 35;
+    }
+    .audio-bar.visible { display: flex; }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      height: 66px;
+      background: #FFFFFF;
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      z-index: 40;
+    }
+
+    .nav-item {
+      border: none;
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink-muted);
+      cursor: pointer;
+    }
+    .nav-item.active { color: var(--sage-deep); font-weight: 700; }
+    .nav-icon { font-size: 18px; }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(22, 24, 23, 0.72);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 60;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-card {
+      background: var(--cream);
+      width: 100%;
+      max-width: 430px;
+      max-height: 85vh;
+      overflow-y: auto;
+      border-radius: 18px;
+      padding: 20px;
+      border: 1px solid var(--gold);
+    }
+    .badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: var(--sage-tint);
+      color: var(--sage-deep);
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Header -->
+    <header class="top-bar">
+      <div class="top-bar-row">
+        <div>
+          <div class="brand-eyebrow">Spiritual Architecture &amp; Governance</div>
+          <div class="brand-title serif">Sincere Milk &amp; Solid Food</div>
+        </div>
+        <button id="authBtn" class="auth-pill" type="button">Sign In</button>
+      </div>
+    </header>
+
+    <!-- SCREEN 1: LISTEN (PODCASTS) -->
+    <section id="screen-listen" class="screen active">
+      <div class="section-header">
+        <h2>The Broadcast Table</h2>
+        <p>Live episodes from <strong>Sincere Milk &amp; Solid Food</strong> and <strong>31 Days in Proverbs 31</strong>.</p>
+      </div>
+      <div class="chips">
+        <a href="https://open.spotify.com/show/4zRBHR5asDACkgwGqMygpn" target="_blank" class="chip">Spotify</a>
+        <a href="https://podcasts.apple.com/gb/podcast/sincere-milk-solid-food/id1889851727" target="_blank" class="chip">Apple Podcasts</a>
+        <a href="https://youtube.com/@sinceremilksolidfoodpodcast" target="_blank" class="chip">YouTube</a>
+      </div>
+      <div id="podcastList">
+        <div class="card"><p style="font-size:13px;color:var(--ink-muted);">Loading latest episodes from your RSS feed...</p></div>
+      </div>
+    </section>
+
+    <!-- SCREEN 2: READ (BLOGS & PRAYERS) -->
+    <section id="screen-read" class="screen">
+      <div class="section-header">
+        <h2>The Blueprint</h2>
+        <p>Structured teachings synced directly from <strong>sinceremilksolidfood.org</strong>.</p>
+      </div>
+      <div class="chips" id="categoryChips">
+        <button class="chip active" data-cat="all" type="button">All Teachings</button>
+        <button class="chip" data-cat="nursery" type="button">The Nursery</button>
+        <button class="chip" data-cat="transition" type="button">The Transition</button>
+        <button class="chip" data-cat="solid-food" type="button">Solid Food</button>
+        <button class="chip" data-cat="soul-audit" type="button">Soul Audits</button>
+        <button class="chip" data-cat="courtroom" type="button">Courtroom of Heaven</button>
+        <button class="chip" data-cat="legislative" type="button">Legislative Prayers</button>
+      </div>
+      <div id="blogList">
+        <div class="card"><p style="font-size:13px;color:var(--ink-muted);">Syncing your WordPress library...</p></div>
+      </div>
+    </section>
+
+    <!-- SCREEN 3: HOUSE OF PRAYER -->
+    <section id="screen-pray" class="screen">
+      <div class="section-header">
+        <h2>House of Prayer</h2>
+        <p><em>"My house shall be called a house of prayer."</em> — Matthew 21:13</p>
+      </div>
+
+      <!-- Visual Altar Header -->
+      <div class="altar-sanctuary">
+        <div class="altar-flame" title="The fire on the altar shall not go out"></div>
+        <div class="altar-stone">Altar of Petitions</div>
+        <div class="altar-stats">
+          <div><strong id="activeCount">0</strong>On the Altar</div>
+          <div><strong id="answeredCount">0</strong>Memorial Stones</div>
+          <div><strong id="corporateCount">0</strong>In Agreement</div>
+        </div>
+      </div>
+
+      <!-- Three Chambers Navigation -->
+      <div class="chamber-tabs">
+        <button class="chamber-btn active" data-chamber="personal" type="button">The Personal Altar</button>
+        <button class="chamber-btn" data-chamber="corporate" type="button">Where Two or Three Gather in My Name</button>
+        <button class="chamber-btn" data-chamber="remembrance" type="button">The Hall of Remembrance</button>
+      </div>
+
+      <!-- CHAMBER 1: THE PERSONAL ALTAR -->
+      <div id="chamber-personal">
+        <button id="toggleComposerBtn" class="btn btn-gold" style="margin-bottom:14px;" type="button">+ Lay a New Petition on the Altar</button>
+
+        <div id="petitionComposer" class="card" style="display:none; border-color:var(--gold);">
+          <h3 style="font-size:21px; margin-bottom:10px;">Draft Your Petition</h3>
+          <div class="field">
+            <label>Petition Title</label>
+            <input id="petTitle" type="text" placeholder="e.g., Healing &amp; Renewal in My Thought Life" />
+          </div>
+          <div class="field">
+            <label>Spiritual Track / Focus</label>
+            <select id="petCategory">
+              <option value="Healing &amp; Mind">Healing &amp; Renewal of Mind</option>
+              <option value="Courtroom of Heaven">Courtroom of Heaven Legal Case</option>
+              <option value="Kingdom Come Legislative">Kingdom Come Legislative Decree</option>
+              <option value="Provision &amp; Stewardship">Provision, Funding &amp; Stewardship</option>
+              <option value="Relationships &amp; Alignment">Relationships, Marriage &amp; Alignment</option>
+              <option value="Territory &amp; Purpose">Territory, Calling &amp; Consistency</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>What I Am Trusting God For (Details)</label>
+            <textarea id="petDetails" placeholder="Write specifically what you are placing on the altar..."></textarea>
+          </div>
+          <div class="field">
+            <label>Scriptures I Am Standing On</label>
+            <input id="petScripture" type="text" placeholder="e.g., Romans 12:2, Isaiah 26:3, 2 Timothy 1:7" />
+          </div>
+          <div class="field">
+            <label>Altar Visibility</label>
+            <div class="privacy-toggle">
+              <button type="button" class="privacy-option selected" data-vis="private">
+                <strong>Private Altar</strong>
+                <span>Strictly between you &amp; God</span>
+              </button>
+              <button type="button" class="privacy-option" data-vis="corporate">
+                <strong>Community Agreement</strong>
+                <span>Invite believers to agree</span>
+              </button>
+            </div>
+          </div>
+          <div id="anonWrap" class="field" style="display:none;">
+            <label>Display Name on Corporate Altar</label>
+            <select id="petAuthorDisplay">
+              <option value="named">Use My First Name</option>
+              <option value="anon">Post as "A Fellow Believer" (Anonymous)</option>
+            </select>
+          </div>
+          <button id="submitPetitionBtn" class="btn btn-primary" type="button">Lay Petition on the Altar</button>
+        </div>
+
+        <div id="personalAltarList"></div>
+      </div>
+
+      <!-- CHAMBER 2: WHERE TWO OR THREE GATHER IN MY NAME -->
+      <div id="chamber-corporate" style="display:none;">
+        <div class="card" style="background:var(--sage-tint); border-color:var(--sage);">
+          <strong style="font-size:13px; color:var(--sage-deep); display:block;">Matthew 18:19–20</strong>
+          <p style="font-size:12px; color:var(--ink); margin-top:3px;">Stand in faith with brothers and sisters across the ministry. Tap <strong>Stand in Agreement</strong> to join your faith with theirs.</p>
+        </div>
+        <div id="corporateAltarList"></div>
+      </div>
+
+      <!-- CHAMBER 3: THE HALL OF REMEMBRANCE -->
+      <div id="chamber-remembrance" style="display:none;">
+        <div class="card" style="background:var(--gold-tint); border-color:var(--gold);">
+          <strong style="font-size:13px; color:var(--gold-deep); display:block;">Ebenezer — Memorial Stones of Breakthrough</strong>
+          <p style="font-size:12px; color:var(--ink); margin-top:3px;">Every answered petition becomes a permanent stone of remembrance documenting God's faithfulness in your house.</p>
+        </div>
+        <div id="remembranceList"></div>
+      </div>
+    </section>
+
+    <!-- SCREEN 4: JOURNAL (SOUL AUDITS) -->
+    <section id="screen-journal" class="screen">
+      <div class="section-header">
+        <h2>The Warehouse</h2>
+        <p>Execute your daily <strong>Soul Audit</strong> and convert any reflection straight onto your Altar.</p>
+      </div>
+      <div class="card">
+        <div class="field">
+          <label>1. What is currently occupying my mental warehouse?</label>
+          <textarea id="auditReflect" placeholder="Be honest before God—identify patterns, fears, or assignments..."></textarea>
+        </div>
+        <div class="field">
+          <label>2. Scripture Anchor for Governance</label>
+          <input id="auditScripture" type="text" placeholder="e.g., Proverbs 4:23" />
+        </div>
+        <div class="field">
+          <label>3. Concrete Step of Obedience Today</label>
+          <input id="auditAction" type="text" placeholder="What boundary, restitution, or action will you take?" />
+        </div>
+        <div style="display:grid; gap:8px;">
+          <button id="saveAuditBtn" class="btn btn-primary" type="button">Seal &amp; Save Soul Audit</button>
+          <button id="auditToAltarBtn" class="btn btn-gold" type="button">Save &amp; Lay on the Altar</button>
+        </div>
+      </div>
+      <h3 style="font-size:21px; margin:16px 0 10px;">Sealed Audit Ledger</h3>
+      <div id="auditLedgerList"></div>
+    </section>
+
+    <!-- SCREEN 5: LIBRARY (BOOKS & GUIDES) -->
+    <section id="screen-library" class="screen">
+      <div class="section-header">
+        <h2>Kingdom Library</h2>
+        <p>Put pen to paper with your self-published books, study guides, and guided journals.</p>
+      </div>
+      <div id="libraryList"></div>
+    </section>
+
+    <!-- Mini Audio Player -->
+    <div id="audioBar" class="audio-bar">
+      <div style="overflow:hidden;">
+        <div style="font-size:10px; color:var(--gold); text-transform:uppercase; font-weight:700;">Now Playing</div>
+        <div id="audioTitle" style="font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Episode</div>
+      </div>
+      <audio id="audioPlayer" controls style="height:32px; max-width:190px;"></audio>
+    </div>
+
+    <!-- Bottom Tab Navigation -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-screen="listen" type="button"><span class="nav-icon">&#127911;</span>Listen</button>
+      <button class="nav-item" data-screen="read" type="button"><span class="nav-icon">&#128214;</span>Read</button>
+      <button class="nav-item" data-screen="pray" type="button"><span class="nav-icon">&#128293;</span>Pray</button>
+      <button class="nav-item" data-screen="journal" type="button"><span class="nav-icon">&#9997;</span>Journal</button>
+      <button class="nav-item" data-screen="library" type="button"><span class="nav-icon">&#128218;</span>Library</button>
+    </nav>
+  </div>
+
+  <!-- Reader & Auth Modal -->
+  <div id="appModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <span id="modalBadge" class="badge">Teaching</span>
+        <button id="closeModalBtn" class="btn btn-sm btn-outline" type="button">Close</button>
+      </div>
+      <h3 id="modalTitle" style="font-size:24px; margin-bottom:10px;">Title</h3>
+      <div id="modalBody" style="font-size:14px; line-height:1.65; color:var(--ink);"></div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK & Application Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getAuth, onAuthStateChanged, signInWithEmailAndPassword,
+      createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signOut, updateProfile
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      getFirestore, collection, addDoc, getDocs, doc, updateDoc,
+      query, orderBy, increment, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // =========================================================================
+    // PASTE YOUR FIREBASE CONFIG FROM STAGE 2 BELOW
+    // =========================================================================
+   const firebaseConfig = {
+  apiKey: "AIzaSyD20J9RNk1rB1KPyqpQmAaAVpwr_ZTJe4g",
+  authDomain: "sincere-milk-solid-food.firebaseapp.com",
+  projectId: "sincere-milk-solid-food",
+  storageBucket: "sincere-milk-solid-food.firebasestorage.app",
+  messagingSenderId: "135729288478",
+  appId: "1:135729288478:web:d574fd47b33e5b4049a50f",
+  measurementId: "G-BBRRM1L533"
+};
+
+    let auth = null;
+    let db = null;
+    let currentUser = null;
+    const isFirebaseConfigured = firebaseConfig.apiKey !== "YOUR_FIREBASE_API_KEY";
+
+    if (isFirebaseConfigured) {
+      const app = initializeApp(firebaseConfig);
+      auth = getAuth(app);
+      db = getFirestore(app);
+    }
+
+    // =========================================================================
+    // 1. PRAYER-TO-KNOWLEDGE MATCHING ENGINE (HOSEA 4:6)
+    // =========================================================================
+    const KNOWLEDGE_WAREHOUSE = [
+      {
+        keywords: ["fear", "trauma", "mind", "thought", "anxiet", "overthink", "childhood", "wound", "heal"],
+        lesson: "Soul Audit: Unlearning Childhood Coping Mechanisms & Hedging Your Bets vs. Radical Trust",
+        book: "Out of the Strong, Something Sweet: 33 Biblical Concepts for Freedom",
+        shopUrl: "https://kingdomgiftcenter.co.uk/collections/books-and-journals"
+      },
+      {
+        keywords: ["marriage", "yoked", "relationship", "husband", "wife", "boundary", "boundaries", "hurt", "idol"],
+        lesson: "What It Actually Means to Be 'Yoked': A Blueprint from the Soil & The Unspoken Exit",
+        book: "Sincere Milk & Solid Food Guided Journal: Vol. 1",
+        shopUrl: "https://kingdomgiftcenter.co.uk/collections/books-and-journals/products/sincere-milk-solid-food-guided-journal-vol-1-sessions-1-16"
+      },
+      {
+        keywords: ["court", "legal", "warfare", "battle", "enemy", "authority", "territory", "decree"],
+        lesson: "Courtroom of Heaven Prayers & Kingdom Come Legislative Prayers",
+        book: "The Believer's Life Cycle",
+        shopUrl: "https://kingdomgiftcenter.co.uk/collections/books-and-journals"
+      },
+      {
+        keywords: ["consisten", "discipline", "proverbs", "steward", "provision", "fund", "money", "business"],
+        lesson: "The Engineering of Consistency: Engine Synchronization & 31 Days in Proverbs 31",
+        book: "31 Days in Proverbs 31: The Complete Bible Study Guide",
+        shopUrl: "https://kingdomgiftcenter.co.uk/collections/books-and-journals/products/31-days-in-proverbs-31-the-complete-bible-study-guide"
+      },
+      {
+        keywords: ["evangel", "ministry", "calling", "purpose", "mature", "growth"],
+        lesson: "Solid Food: Moving From the Nursery of Faith to Spiritual Responsibility",
+        book: "The Evangelist's Life Cycle",
+        shopUrl: "https://kingdomgiftcenter.co.uk/collections/books-and-journals"
+      }
+    ];
+
+    function matchKnowledge(title, details, category) {
+      const haystack = `${title} ${details} ${category}`.toLowerCase();
+      for (const item of KNOWLEDGE_WAREHOUSE) {
+        if (item.keywords.some((kw) => haystack.includes(kw))) {
+          return item;
+        }
+      }
+      return {
+        lesson: "Solid Food Track: Becoming a Governor of Your Own Soul",
+        book: "Sincere Milk & Solid Food Guided Journal: Vol. 1",
+        shopUrl: "https://kingdomgiftcenter.co.uk/collections/books-and-journals"
+      };
+    }
+
+    // =========================================================================
+    // 2. BOOKS & STUDY GUIDES CATALOGUE (EASY TO EDIT ANYTIME)
+    // =========================================================================
+    const LIBRARY_BOOKS = [
+      {
+        title: "Out of the Strong, Something Sweet: 33 Biblical Concepts for Freedom",
+        format: "Paperback & Digital Edition",
+        desc: "33 structural biblical concepts designed to dismantle emotional strongholds and establish spiritual freedom.",
+        url: "https://kingdomgiftcenter.co.uk/collections/books-and-journals"
+      },
+      {
+        title: "The Believer's Life Cycle",
+        format: "Book & Study Resource",
+        desc: "A blueprint charting the believer's progression from spiritual infancy to mature Kingdom governance.",
+        url: "https://kingdomgiftcenter.co.uk/collections/books-and-journals"
+      },
+      {
+        title: "The Evangelist's Life Cycle",
+        format: "Book & Ministry Guide",
+        desc: "Equipping ambassadors of Christ with biblical order, endurance, and spiritual maturity.",
+        url: "https://kingdomgiftcenter.co.uk/collections/books-and-journals"
+      },
+      {
+        title: "31 Days in Proverbs 31: The Complete Bible Study Guide",
+        format: "Printed, Ebook & Modular Editions",
+        desc: "A comprehensive, structured study guide anchoring believers in dynastic wisdom and spiritual responsibility.",
+        url: "https://kingdomgiftcenter.co.uk/collections/books-and-journals/products/31-days-in-proverbs-31-the-complete-bible-study-guide"
+      },
+      {
+        title: "Sincere Milk & Solid Food Guided Journal: Vol. 1 (Sessions 1–16)",
+        format: "Interactive Guided Ledger",
+        desc: "A 16-session companion ledger to track your soul audits, manage your mental warehouse, and document victories.",
+        url: "https://kingdomgiftcenter.co.uk/collections/books-and-journals/products/sincere-milk-solid-food-guided-journal-vol-1-sessions-1-16"
+      }
+    ];
+
+    function renderLibrary() {
+      const container = document.getElementById("libraryList");
+      container.innerHTML = LIBRARY_BOOKS.map((b) => `
+        <div class="card">
+          <span class="badge">${b.format}</span>
+          <h3 style="font-size:21px; margin-bottom:6px;">${b.title}</h3>
+          <p style="font-size:13px; color:var(--ink-muted); line-height:1.5; margin-bottom:12px;">${b.desc}</p>
+          <a href="${b.url}" target="_blank" class="btn btn-primary btn-sm" style="text-decoration:none;">Get From Kingdom Gift Centre &rarr;</a>
+        </div>
+      `).join("");
+    }
+
+    // =========================================================================
+    // 3. LIVE WORDPRESS BLOG & PODCAST RSS SYNC
+    // =========================================================================
+    let cachedPosts = [];
+
+    async function loadWordPressPosts() {
+      const blogList = document.getElementById("blogList");
+      try {
+        const res = await fetch("https://sinceremilksolidfood.org/wp-json/wp/v2/posts?per_page=20&_embed");
+        const posts = await res.json();
+        cachedPosts = posts;
+        renderPosts(posts);
+      } catch (err) {
+        blogList.innerHTML = `<div class="card"><p style="font-size:13px;">Could not reach live feed right now. Visit <a href="https://sinceremilksolidfood.org/blog/" target="_blank">sinceremilksolidfood.org/blog</a>.</p></div>`;
+      }
+    }
+
+    function renderPosts(posts) {
+      const blogList = document.getElementById("blogList");
+      if (!posts.length) {
+        blogList.innerHTML = `<div class="card"><p style="font-size:13px;">No teachings found in this track yet.</p></div>`;
+        return;
+      }
+      blogList.innerHTML = posts.map((post, idx) => {
+        const terms = post._embedded?.["wp:term"]?.[0] || [];
+        const catName = terms[0]?.name || "Ministry Teaching";
+        const excerpt = post.excerpt?.rendered?.replace(/<[^>]+>/g, "").slice(0, 145) + "...";
+        return `
+          <div class="card">
+            <span class="badge">${catName}</span>
+            <h3 style="font-size:20px; margin-bottom:6px;">${post.title.rendered}</h3>
+            <p style="font-size:13px; color:var(--ink-muted); line-height:1.5; margin-bottom:10px;">${excerpt}</p>
+            <button class="btn btn-outline btn-sm read-post-btn" data-idx="${idx}" type="button">Read Teaching</button>
+          </div>
+        `;
+      }).join("");
+
+      document.querySelectorAll(".read-post-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const p = cachedPosts[Number(btn.dataset.idx)];
+          openModal("Teaching", p.title.rendered, p.content.rendered);
+        });
+      });
+    }
+
+    async function loadPodcastRSS() {
+      const podList = document.getElementById("podcastList");
+      try {
+        const rssUrl = encodeURIComponent("https://sinceremilksolidfood.org/feed/podcast");
+        const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`);
+        const data = await res.json();
+        const items = data.items || [];
+        podList.innerHTML = items.slice(0, 15).map((ep, i) => `
+          <div class="card">
+            <span class="badge">Episode</span>
+            <h3 style="font-size:20px; margin-bottom:6px;">${ep.title}</h3>
+            <p style="font-size:12px; color:var(--ink-muted); margin-bottom:10px;">${new Date(ep.pubDate).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</p>
+            <button class="btn btn-primary btn-sm play-ep-btn" data-audio="${ep.enclosure?.link || ""}" data-title="${ep.title.replace(/"/g, "&quot;")}" type="button">&#9654; Play Episode</button>
+          </div>
+        `).join("");
+
+        document.querySelectorAll(".play-ep-btn").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const src = btn.dataset.audio;
+            if (!src) return;
+            const player = document.getElementById("audioPlayer");
+            document.getElementById("audioTitle").textContent = btn.dataset.title;
+            document.getElementById("audioBar").classList.add("visible");
+            player.src = src;
+            player.play();
+          });
+        });
+      } catch (err) {
+        podList.innerHTML = `<div class="card"><p style="font-size:13px;">Listen directly on <a href="https://open.spotify.com/show/4zRBHR5asDACkgwGqMygpn" target="_blank">Spotify</a> or <a href="https://sinceremilksolidfood.org/ssp-podcast-archive/" target="_blank">sinceremilksolidfood.org</a>.</p></div>`;
+      }
+    }
+
+    // =========================================================================
+    // 4. HOUSE OF PRAYER & SOUL AUDITS (CLOUD + LOCAL FALLBACK)
+    // =========================================================================
+    let selectedVisibility = "private";
+    let localPetitions = JSON.parse(localStorage.getItem("smsf_petitions") || "[]");
+    let localCorporate = JSON.parse(localStorage.getItem("smsf_corporate") || JSON.stringify([
+      {
+        id: "demo-1",
+        title: "Steadfastness & Consistency in Our Spiritual Walk",
+        category: "Territory & Purpose",
+        details: "Standing together that every believer in this house moves from spiritual milk to unshakeable maturity.",
+        scripture: "Hebrews 5:14, 1 Corinthians 15:58",
+        authorName: "Nyangu (Host)",
+        agreements: 24
+      }
+    ]));
+    let localAudits = JSON.parse(localStorage.getItem("smsf_audits") || "[]");
+
+    async function loadHouseOfPrayer() {
+      let petitions = localPetitions;
+      let corporate = localCorporate;
+
+      if (isFirebaseConfigured && currentUser) {
+        const snap = await getDocs(query(collection(db, "users", currentUser.uid, "petitions"), orderBy("createdAt", "desc")));
+        petitions = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+        const corpSnap = await getDocs(query(collection(db, "corporate_altar"), orderBy("createdAt", "desc")));
+        corporate = corpSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      }
+
+      const active = petitions.filter((p) => p.status !== "answered");
+      const answered = petitions.filter((p) => p.status === "answered");
+
+      document.getElementById("activeCount").textContent = active.length;
+      document.getElementById("answeredCount").textContent = answered.length;
+      document.getElementById("corporateCount").textContent = corporate.length;
+
+      // Render Personal Altar
+      const personalList = document.getElementById("personalAltarList");
+      personalList.innerHTML = active.length ? active.map((p) => {
+        const k = p.knowledge || matchKnowledge(p.title, p.details, p.category);
+        return `
+          <div class="card">
+            <span class="badge">${p.category} ${p.visibility === "corporate" ? "• Shared in Agreement" : "• Private Altar"}</span>
+            <h3 style="font-size:20px; margin-bottom:6px;">${p.title}</h3>
+            <p style="font-size:13px; color:var(--ink); line-height:1.5; margin-bottom:8px;">${p.details}</p>
+            ${p.scripture ? `<p style="font-size:12px; color:var(--gold-deep); font-weight:700; margin-bottom:8px;">Standing On: ${p.scripture}</p>` : ""}
+            <div class="knowledge-box">
+              <strong>Renew Your Mind (Hosea 4:6):</strong>
+              <span>Recommended Lesson: <em>${k.lesson}</em></span><br/>
+              <a href="${k.shopUrl}" target="_blank" style="color:var(--sage-deep); font-weight:700; display:inline-block; margin-top:4px;">Study Book: ${k.book} &rarr;</a>
+            </div>
+            <div style="margin-top:12px;">
+              <button class="btn btn-gold btn-sm mark-answered-btn" data-id="${p.id}" type="button">Record Testimony (Raise Memorial Stone)</button>
+            </div>
+          </div>
+        `;
+      }).join("") : `<div class="card"><p style="font-size:13px; color:var(--ink-muted);">Your Personal Altar is clear. Tap <strong>+ Lay a New Petition on the Altar</strong> above to place a prayer point before God.</p></div>`;
+
+      // Render Where Two or Three Gather in My Name
+      const corpList = document.getElementById("corporateAltarList");
+      corpList.innerHTML = corporate.map((c) => `
+        <div class="card">
+          <span class="badge">${c.category} • Posted by ${c.authorName || "A Fellow Believer"}</span>
+          <h3 style="font-size:20px; margin-bottom:6px;">${c.title}</h3>
+          <p style="font-size:13px; color:var(--ink); line-height:1.5; margin-bottom:8px;">${c.details}</p>
+          ${c.scripture ? `<p style="font-size:12px; color:var(--gold-deep); font-weight:700; margin-bottom:10px;">Standing On: ${c.scripture}</p>` : ""}
+          <button class="btn btn-outline btn-sm agree-btn" data-id="${c.id}" type="button">&#128591; Stand in Agreement (${c.agreements || 1} Believers)</button>
+        </div>
+      `).join("");
+
+      // Render Hall of Remembrance
+      const remList = document.getElementById("remembranceList");
+      remList.innerHTML = answered.length ? answered.map((a) => `
+        <div class="memorial-stone">
+          <span class="badge" style="background:var(--gold); color:#FFFFFF;">Memorial Stone • Answered Prayer</span>
+          <h3 style="font-size:20px; margin-bottom:6px;">${a.title}</h3>
+          <p style="font-size:13px; color:var(--ink); line-height:1.5; margin-bottom:6px;">${a.details}</p>
+          ${a.testimony ? `<p style="font-size:13px; font-weight:600; color:var(--sage-deep); background:#FFFFFF; padding:8px 10px; border-radius:8px;">Testimony: "${a.testimony}"</p>` : ""}
+        </div>
+      `).join("") : `<div class="card"><p style="font-size:13px; color:var(--ink-muted);">No memorial stones raised yet. When God answers a petition on your altar, record your testimony to place a permanent stone here.</p></div>`;
+
+      // Bind Mark Answered buttons
+      document.querySelectorAll(".mark-answered-btn").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const id = btn.dataset.id;
+          const testimony = prompt("Record a brief testimony of how God answered this prayer:") || "Answered by the faithfulness of God.";
+          if (isFirebaseConfigured && currentUser) {
+            await updateDoc(doc(db, "users", currentUser.uid, "petitions", id), {
+              status: "answered",
+              testimony,
+              answeredAt: serverTimestamp()
+            });
+          } else {
+            localPetitions = localPetitions.map((item) => item.id === id ? { ...item, status: "answered", testimony } : item);
+            localStorage.setItem("smsf_petitions", JSON.stringify(localPetitions));
+          }
+          loadHouseOfPrayer();
+        });
+      });
+
+      // Bind Stand in Agreement buttons
+      document.querySelectorAll(".agree-btn").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const id = btn.dataset.id;
+          if (isFirebaseConfigured && currentUser) {
+            await updateDoc(doc(db, "corporate_altar", id), { agreements: increment(1) });
+          } else {
+            localCorporate = localCorporate.map((item) => item.id === id ? { ...item, agreements: (item.agreements || 1) + 1 } : item);
+            localStorage.setItem("smsf_corporate", JSON.stringify(localCorporate));
+          }
+          loadHouseOfPrayer();
+        });
+      });
+    }
+
+    async function loadAudits() {
+      let audits = localAudits;
+      if (isFirebaseConfigured && currentUser) {
+        const snap = await getDocs(query(collection(db, "users", currentUser.uid, "audits"), orderBy("createdAt", "desc")));
+        audits = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      }
+      const list = document.getElementById("auditLedgerList");
+      list.innerHTML = audits.length ? audits.map((a, idx) => `
+        <div class="card">
+          <span class="badge">Sealed Soul Audit</span>
+          <p style="font-size:13px; line-height:1.5; margin-bottom:6px;">${a.reflect}</p>
+          ${a.scripture ? `<p style="font-size:12px; color:var(--gold-deep); font-weight:700; margin-bottom:8px;">Anchor: ${a.scripture}</p>` : ""}
+          <button class="btn btn-outline btn-sm audit-convert-btn" data-idx="${idx}" type="button">Lay on the Altar &rarr;</button>
+        </div>
+      `).join("") : `<div class="card"><p style="font-size:13px; color:var(--ink-muted);">Your audit ledger is ready for your first entry.</p></div>`;
+
+      document.querySelectorAll(".audit-convert-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const item = audits[Number(btn.dataset.idx)];
+          switchScreen("pray");
+          document.getElementById("petitionComposer").style.display = "block";
+          document.getElementById("petTitle").value = "Soul Audit Petition";
+          document.getElementById("petDetails").value = item.reflect;
+          document.getElementById("petScripture").value = item.scripture || "";
+        });
+      });
+    }
+
+    // =========================================================================
+    // 5. NAVIGATION & EVENT LISTENERS
+    // =========================================================================
+    function switchScreen(name) {
+      document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
+      document.getElementById(`screen-${name}`).classList.add("active");
+      document.querySelectorAll(".nav-item").forEach((n) => n.classList.toggle("active", n.dataset.screen === name));
+    }
+
+    document.querySelectorAll(".nav-item").forEach((btn) => {
+      btn.addEventListener("click", () => switchScreen(btn.dataset.screen));
+    });
+
+    document.querySelectorAll(".chamber-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".chamber-btn").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        const target = btn.dataset.chamber;
+        ["personal", "corporate", "remembrance"].forEach((c) => {
+          document.getElementById(`chamber-${c}`).style.display = c === target ? "block" : "none";
+        });
+      });
+    });
+
+    document.getElementById("toggleComposerBtn").addEventListener("click", () => {
+      const box = document.getElementById("petitionComposer");
+      box.style.display = box.style.display === "none" ? "block" : "none";
+    });
+
+    document.querySelectorAll(".privacy-option").forEach((opt) => {
+      opt.addEventListener("click", () => {
+        document.querySelectorAll(".privacy-option").forEach((o) => o.classList.remove("selected"));
+        opt.classList.add("selected");
+        selectedVisibility = opt.dataset.vis;
+        document.getElementById("anonWrap").style.display = selectedVisibility === "corporate" ? "block" : "none";
+      });
+    });
+
+    document.getElementById("submitPetitionBtn").addEventListener("click", async () => {
+      const title = document.getElementById("petTitle").value.trim();
+      const category = document.getElementById("petCategory").value;
+      const details = document.getElementById("petDetails").value.trim();
+      const scripture = document.getElementById("petScripture").value.trim();
+      if (!title || !details) {
+        alert("Please enter both a petition title and what you are trusting God for.");
+        return;
+      }
+
+      const knowledge = matchKnowledge(title, details, category);
+      const payload = {
+        title,
+        category,
+        details,
+        scripture,
+        visibility: selectedVisibility,
+        status: "active",
+        knowledge,
+        createdAt: isFirebaseConfigured ? serverTimestamp() : Date.now()
+      };
+
+      if (isFirebaseConfigured && currentUser) {
+        await addDoc(collection(db, "users", currentUser.uid, "petitions"), payload);
+        if (selectedVisibility === "corporate") {
+          const displayMode = document.getElementById("petAuthorDisplay").value;
+          const authorName = displayMode === "anon" ? "A Fellow Believer" : (currentUser.displayName || "Believer");
+          await addDoc(collection(db, "corporate_altar"), {
+            ...payload,
+            authorUid: currentUser.uid,
+            authorName,
+            agreements: 1
+          });
+        }
+      } else {
+        const localItem = { id: "pet-" + Date.now(), ...payload };
+        localPetitions.unshift(localItem);
+        localStorage.setItem("smsf_petitions", JSON.stringify(localPetitions));
+        if (selectedVisibility === "corporate") {
+          localCorporate.unshift({ ...localItem, authorName: "A Fellow Believer", agreements: 1 });
+          localStorage.setItem("smsf_corporate", JSON.stringify(localCorporate));
+        }
+      }
+
+      document.getElementById("petTitle").value = "";
+      document.getElementById("petDetails").value = "";
+      document.getElementById("petScripture").value = "";
+      document.getElementById("petitionComposer").style.display = "none";
+      loadHouseOfPrayer();
+    });
+
+    async function saveSoulAudit(sendToAltar) {
+      const reflect = document.getElementById("auditReflect").value.trim();
+      const scripture = document.getElementById("auditScripture").value.trim();
+      const action = document.getElementById("auditAction").value.trim();
+      if (!reflect) {
+        alert("Write your Soul Audit reflection first.");
+        return;
+      }
+      const entry = { reflect, scripture, action, createdAt: isFirebaseConfigured ? serverTimestamp() : Date.now() };
+      if (isFirebaseConfigured && currentUser) {
+        await addDoc(collection(db, "users", currentUser.uid, "audits"), entry);
+      } else {
+        localAudits.unshift({ id: "aud-" + Date.now(), ...entry });
+        localStorage.setItem("smsf_audits", JSON.stringify(localAudits));
+      }
+      document.getElementById("auditReflect").value = "";
+      document.getElementById("auditScripture").value = "";
+      document.getElementById("auditAction").value = "";
+      await loadAudits();
+
+      if (sendToAltar) {
+        switchScreen("pray");
+        document.getElementById("petitionComposer").style.display = "block";
+        document.getElementById("petTitle").value = "Soul Audit Petition";
+        document.getElementById("petDetails").value = reflect;
+        document.getElementById("petScripture").value = scripture;
+      }
+    }
+
+    document.getElementById("saveAuditBtn").addEventListener("click", () => saveSoulAudit(false));
+    document.getElementById("auditToAltarBtn").addEventListener("click", () => saveSoulAudit(true));
+
+    // Category Filtering
+    document.querySelectorAll("#categoryChips .chip").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        document.querySelectorAll("#categoryChips .chip").forEach((c) => c.classList.remove("active"));
+        chip.classList.add("active");
+        const slug = chip.dataset.cat;
+        if (slug === "all") {
+          renderPosts(cachedPosts);
+          return;
+        }
+        const filtered = cachedPosts.filter((p) => {
+          const terms = p._embedded?.["wp:term"]?.[0] || [];
+          return terms.some((t) => t.slug.includes(slug) || t.name.toLowerCase().includes(slug.replace("-", " ")));
+        });
+        renderPosts(filtered);
+      });
+    });
+
+    // Modal & Authentication UI
+    function openModal(badge, title, htmlBody) {
+      document.getElementById("modalBadge").textContent = badge;
+      document.getElementById("modalTitle").textContent = title;
+      document.getElementById("modalBody").innerHTML = htmlBody;
+      document.getElementById("appModal").classList.add("open");
+    }
+    document.getElementById("closeModalBtn").addEventListener("click", () => {
+      document.getElementById("appModal").classList.remove("open");
+    });
+
+    document.getElementById("authBtn").addEventListener("click", () => {
+      if (!isFirebaseConfigured) {
+        openModal("Setup Notice", "Connect Firebase Keys", "<p>Paste your <code>firebaseConfig</code> keys into <code>index.html</code> (Stage 2 of your manual) to activate live cloud accounts across devices.</p>");
+        return;
+      }
+      if (currentUser) {
+        signOut(auth);
+        return;
+      }
+      openModal("House of Prayer", "Sign In to Sync Your Altar", `
+        <div class="field"><label>First Name (For New Accounts)</label><input id="authName" type="text" placeholder="e.g., Nyangu" /></div>
+        <div class="field"><label>Email Address</label><input id="authEmail" type="email" placeholder="you@example.com" /></div>
+        <div class="field"><label>Password</label><input id="authPass" type="password" placeholder="At least 6 characters" /></div>
+        <div style="display:grid; gap:8px; margin-top:10px;">
+          <button id="emailLoginBtn" class="btn btn-primary" type="button">Sign In</button>
+          <button id="emailSignupBtn" class="btn btn-outline" type="button">Create New Account</button>
+          <button id="googleLoginBtn" class="btn btn-gold" type="button">Continue with Google</button>
+        </div>
+      `);
+
+      document.getElementById("emailLoginBtn").addEventListener("click", async () => {
+        try {
+          await signInWithEmailAndPassword(auth, document.getElementById("authEmail").value, document.getElementById("authPass").value);
+          document.getElementById("appModal").classList.remove("open");
+        } catch (e) { alert(e.message); }
+      });
+
+      document.getElementById("emailSignupBtn").addEventListener("click", async () => {
+        try {
+          const cred = await createUserWithEmailAndPassword(auth, document.getElementById("authEmail").value, document.getElementById("authPass").value);
+          const name = document.getElementById("authName").value.trim();
+          if (name) await updateProfile(cred.user, { displayName: name });
+          document.getElementById("appModal").classList.remove("open");
+        } catch (e) { alert(e.message); }
+      });
+
+      document.getElementById("googleLoginBtn").addEventListener("click", async () => {
+        try {
+          await signInWithPopup(auth, new GoogleAuthProvider());
+          document.getElementById("appModal").classList.remove("open");
+        } catch (e) { alert(e.message); }
+      });
+    });
+
+    if (isFirebaseConfigured) {
+      onAuthStateChanged(auth, (user) => {
+        currentUser = user;
+        document.getElementById("authBtn").textContent = user ? "Sign Out" : "Sign In";
+        loadHouseOfPrayer();
+        loadAudits();
+      });
+    }
+
+    // Register Service Worker & Initialize
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js").catch(() => {});
+    }
+
+    renderLibrary();
+    loadWordPressPosts();
+    loadPodcastRSS();
+    loadHouseOfPrayer();
+    loadAudits();
+  </script>
+</body>
+</html>
