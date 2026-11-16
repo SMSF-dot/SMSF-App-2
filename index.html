@@ -410,7 +410,7 @@
     .glory-overlay {
       position: fixed;
       inset: 0;
-      z-index: 90;
+      z-index: 9999;
       display: none;
       flex-direction: column;
       align-items: center;
@@ -419,10 +419,12 @@
       padding: 28px 22px;
       overflow: hidden;
       background: linear-gradient(180deg, #121917 0%, #1F312A 55%, #3B4938 100%);
-      animation: skySunrise 4.2s ease forwards;
     }
 
-    .glory-overlay.active { display: flex; }
+    .glory-overlay.active {
+      display: flex;
+      animation: skySunrise 4.2s ease forwards;
+    }
 
     @keyframes skySunrise {
       0% { background: linear-gradient(180deg, #0E1412 0%, #1B2823 65%, #26332D 100%); }
@@ -435,6 +437,9 @@
       inset: 0;
       pointer-events: none;
       overflow: hidden;
+    }
+
+    .glory-overlay.active .rain-layer {
       animation: rainFade 4s ease forwards;
     }
 
@@ -451,6 +456,7 @@
       height: 22px;
       background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(247, 224, 163, 0.85) 100%);
       border-radius: 999px;
+      box-shadow: 0 0 7px rgba(247, 224, 163, 0.6);
       animation: fallDrop linear infinite;
     }
 
@@ -471,6 +477,10 @@
       background: radial-gradient(circle, #FFF9DB 0%, #F7C95C 48%, rgba(229, 169, 60, 0) 74%);
       box-shadow: 0 0 90px rgba(247, 201, 92, 0.85);
       pointer-events: none;
+      opacity: 0.2;
+    }
+
+    .glory-overlay.active .rising-sun {
       animation: sunAscend 3.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
 
@@ -485,6 +495,9 @@
       max-width: 390px;
       opacity: 0;
       transform: translateY(16px);
+    }
+
+    .glory-overlay.active .glory-content {
       animation: scriptureReveal 1.4s ease 1.5s forwards;
     }
 
@@ -761,6 +774,18 @@
         <span>Library</span>
       </button>
     </nav>
+  </div>
+
+  <div id="gloryCelebration" class="glory-overlay" role="dialog" aria-modal="true" aria-labelledby="gloryPrayerTitle">
+    <div id="gloryRain" class="rain-layer" aria-hidden="true"></div>
+    <div class="rising-sun" aria-hidden="true"></div>
+    <div class="glory-content">
+      <span class="badge" style="background:var(--gold); color:#FFFFFF;">Answered Prayer</span>
+      <h2 id="gloryPrayerTitle" style="font-size:30px; color:#FFF9DB; margin:12px 0;">Answered Prayer</h2>
+      <p style="font-size:20px; line-height:1.55; color:#FFFFFF; margin-bottom:8px;">&ldquo;Holy, holy, holy is the Lord of hosts; the whole earth is full of his glory!&rdquo;</p>
+      <p style="font-size:14px; color:#F7E0A3; margin-bottom:20px;">— Isaiah 6:3</p>
+      <button id="enterRemembranceBtn" class="btn btn-gold" type="button">Enter the Hall of Remembrance</button>
+    </div>
   </div>
 
   <!-- Reader & Auth Modal -->
@@ -1659,6 +1684,8 @@
       document.querySelectorAll(".mark-answered-btn").forEach((btn) => {
         btn.addEventListener("click", async () => {
           const id = btn.dataset.id;
+          const answeredPrayer = active.find((petition) => petition.id === id);
+          const prayerTitle = answeredPrayer?.title || "Answered Prayer";
           const testimony = prompt("Record a brief testimony of how God answered this prayer:") || "Answered by the faithfulness of God.";
           if (isFirebaseConfigured && currentUser) {
             await updateDoc(doc(db, "users", currentUser.uid, "petitions", id), {
@@ -1671,6 +1698,7 @@
             localStorage.setItem("smsf_petitions", JSON.stringify(localPetitions));
           }
           loadHouseOfPrayer();
+          triggerGloryCelebration(prayerTitle);
         });
       });
 
@@ -1773,6 +1801,33 @@
           document.getElementById(`chamber-${c}`).style.display = c === target ? "block" : "none";
         });
       });
+    });
+
+    function triggerGloryCelebration(prayerTitle) {
+      const overlay = document.getElementById("gloryCelebration");
+      const rainLayer = document.getElementById("gloryRain");
+      const title = document.getElementById("gloryPrayerTitle");
+      title.textContent = prayerTitle || "Answered Prayer";
+      rainLayer.replaceChildren();
+
+      for (let index = 0; index < 48; index += 1) {
+        const drop = document.createElement("span");
+        drop.className = "rain-drop";
+        drop.style.left = `${Math.random() * 100}%`;
+        drop.style.animationDuration = `${0.8 + Math.random() * 0.9}s`;
+        drop.style.animationDelay = `${-Math.random() * 1.8}s`;
+        rainLayer.appendChild(drop);
+      }
+
+      overlay.classList.remove("active");
+      void overlay.offsetWidth;
+      overlay.classList.add("active");
+    }
+
+    document.getElementById("enterRemembranceBtn").addEventListener("click", () => {
+      document.getElementById("gloryCelebration").classList.remove("active");
+      switchScreen("pray");
+      document.querySelector('.chamber-btn[data-chamber="remembrance"]').click();
     });
 
     document.getElementById("toggleComposerBtn").addEventListener("click", () => {
@@ -2034,10 +2089,6 @@
           <label class="btn btn-outline btn-sm" for="profilePhotoFile">Upload Photo</label>
           <input id="profilePhotoFile" type="file" accept="image/*" style="display:none;" />
         </div>
-        <div class="field">
-          <label for="profilePhotoUrl">Photo URL</label>
-          <input id="profilePhotoUrl" type="url" placeholder="https://example.com/photo.jpg" />
-        </div>
         <p style="font-size:13px; margin-bottom:14px;">Registered Email Address: <strong id="profileEmail"></strong></p>
         <div class="field">
           <label for="profileDisplayName">Display Name</label>
@@ -2078,15 +2129,9 @@
       document.getElementById("profileDisplayName").value = displayName;
       document.getElementById("profileBio").value = profileData.bio || "I am sold out to Jesus Christ!";
       document.getElementById("profileLocation").value = profileData.location || "London";
-      document.getElementById("profilePhotoUrl").value = customPhoto.startsWith("data:") ? "" : customPhoto;
       document.getElementById("profileActiveCount").textContent = document.getElementById("activeCount").textContent || "0";
       document.getElementById("profileMemorialCount").textContent = document.getElementById("answeredCount").textContent || "0";
       document.getElementById("profileAuditCount").textContent = document.querySelectorAll("#auditLedgerList .audit-convert-btn").length;
-
-      document.getElementById("profilePhotoUrl").addEventListener("input", (event) => {
-        customPhoto = event.target.value.trim();
-        renderProfileAvatar(photoPreview, customPhoto, document.getElementById("profileDisplayName").value || "Believer", 88);
-      });
 
       document.getElementById("profilePhotoFile").addEventListener("change", (event) => {
         const file = event.target.files[0];
@@ -2119,7 +2164,6 @@
             context.drawImage(image, 0, 0, canvas.width, canvas.height);
             try {
               customPhoto = canvas.toDataURL("image/jpeg", 0.82);
-              document.getElementById("profilePhotoUrl").value = "";
               renderProfileAvatar(photoPreview, customPhoto, document.getElementById("profileDisplayName").value || "Believer", 88);
             } catch (error) {
               alert(`Could not process the selected image: ${error.message}`);
