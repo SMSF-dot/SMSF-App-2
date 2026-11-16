@@ -716,6 +716,89 @@
       padding: 20px;
       border: 1px solid var(--gold);
     }
+    .custom-dialog-backdrop { z-index: 10010; }
+    .confirmation-card { max-width: 390px; }
+    .confirmation-message {
+      color: var(--ink-muted);
+      font-size: 13px;
+      line-height: 1.55;
+      margin-top: 8px;
+    }
+    .confirmation-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 18px;
+    }
+    .memorial-dialog-eyebrow {
+      display: block;
+      color: var(--gold-deep);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+    }
+    .memorial-testimony-textarea {
+      width: 100%;
+      min-height: 122px;
+      resize: vertical;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--cream-card);
+      color: var(--ink);
+      font: inherit;
+      font-size: 14px;
+      line-height: 1.55;
+      padding: 13px;
+      outline-color: var(--gold);
+    }
+    .toast-notice {
+      align-items: flex-start;
+      background: var(--charcoal);
+      border: 1px solid var(--gold);
+      border-radius: 13px;
+      box-shadow: 0 12px 30px rgba(22, 24, 23, 0.22);
+      color: var(--cream);
+      display: flex;
+      gap: 12px;
+      left: 50%;
+      max-width: 480px;
+      opacity: 0;
+      padding: 12px 14px;
+      pointer-events: none;
+      position: fixed;
+      top: calc(12px + env(safe-area-inset-top));
+      transform: translate(-50%, -10px);
+      transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+      visibility: hidden;
+      width: calc(100% - 28px);
+      z-index: 10020;
+    }
+    .toast-notice[hidden] { display: none; }
+    .toast-notice.visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, 0);
+      visibility: visible;
+    }
+    .toast-message {
+      flex: 1;
+      font-size: 12px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+    .toast-close {
+      background: transparent;
+      border: 0;
+      color: var(--cream);
+      cursor: pointer;
+      font: inherit;
+      font-size: 22px;
+      line-height: 1;
+      margin-top: -2px;
+      padding: 0 2px;
+    }
     .badge {
       display: inline-block;
       font-size: 10px;
@@ -1216,6 +1299,36 @@
       <h3 id="modalTitle" style="font-size:24px; margin-bottom:10px;">Title</h3>
       <div id="modalBody" style="font-size:14px; line-height:1.65; color:var(--ink);"></div>
     </div>
+  </div>
+
+  <div id="confirmationModal" class="modal-backdrop custom-dialog-backdrop" role="dialog" aria-modal="true" aria-labelledby="confirmationModalTitle" aria-describedby="confirmationModalMessage">
+    <div class="modal-card confirmation-card">
+      <span class="badge">Please Confirm</span>
+      <h3 id="confirmationModalTitle" class="serif" style="font-size:27px; color:var(--charcoal); line-height:1.1;"></h3>
+      <p id="confirmationModalMessage" class="confirmation-message"></p>
+      <div class="confirmation-actions">
+        <button id="confirmationCancelBtn" class="btn btn-outline btn-sm" type="button">Cancel</button>
+        <button id="confirmationAcceptBtn" class="btn btn-primary btn-sm" type="button">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="memorialStoneModal" class="modal-backdrop custom-dialog-backdrop" role="dialog" aria-modal="true" aria-labelledby="memorialStoneTitle">
+    <div class="modal-card">
+      <span class="memorial-dialog-eyebrow">Memorial Stone • Testimony</span>
+      <h3 id="memorialStoneTitle" class="serif" style="font-size:30px; color:var(--charcoal); line-height:1.05; margin-bottom:16px;">Record How God Answered</h3>
+      <label for="memorialStoneTestimony" style="display:block; font-size:12px; font-weight:700; color:var(--sage-deep); margin-bottom:7px;">Your testimony</label>
+      <textarea id="memorialStoneTestimony" class="memorial-testimony-textarea" rows="4" placeholder="Write your testimony of God's faithfulness..."></textarea>
+      <div class="confirmation-actions">
+        <button id="memorialStoneCancelBtn" class="btn btn-outline btn-sm" type="button">Cancel</button>
+        <button id="memorialStoneSaveBtn" class="btn btn-gold btn-sm" type="button">Save Memorial Stone</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastNotice" class="toast-notice" role="status" aria-live="polite" aria-atomic="true" hidden>
+    <span id="toastMessage" class="toast-message"></span>
+    <button id="toastCloseBtn" class="toast-close" type="button" aria-label="Dismiss notification">&times;</button>
   </div>
 
   <!-- Firebase SDK & Application Logic -->
@@ -1935,7 +2048,7 @@
       submitButton.addEventListener("click", async () => {
         const message = messageInput.value.trim();
         if (!message) {
-          alert("Write a reflection or question before submitting.");
+          showToast("Write a reflection or question before submitting.");
           return;
         }
 
@@ -1964,7 +2077,7 @@
             ...getLocalPostFeedback()
           ]));
         } catch (error) {
-          alert(`Could not save your message on this device: ${error.message}`);
+          showToast(`Could not save your message on this device: ${error.message}`);
           submitButton.disabled = false;
           return;
         }
@@ -2188,7 +2301,7 @@
 
     function requireAuthenticatedUser() {
       if (!currentUser || !db || !isFirebaseConfigured) {
-        alert("Sign in to a configured Firebase account to use this feature.");
+        showToast("Sign in to a configured Firebase account to use this feature.");
         return false;
       }
       return true;
@@ -2252,7 +2365,7 @@
       const today = getTodayKey();
       const entry = thanksgivingLog[prayerId] || { count: 0, lastDate: "" };
       if (entry.lastDate === today) {
-        alert(`You have already offered a prayer of thanksgiving today for "${prayerTitle}". Keep standing in faith!`);
+        showToast(`You have already offered a prayer of thanksgiving today for "${prayerTitle}". Keep standing in faith!`);
         return;
       }
 
@@ -2288,7 +2401,7 @@
         } catch (error) {
           if (previousEntry) thanksgivingLog[prayerId] = previousEntry;
           else delete thanksgivingLog[prayerId];
-          alert(`Could not save your thanksgiving record: ${error.message}`);
+          showToast(`Could not save your thanksgiving record: ${error.message}`);
           return;
         }
         document.getElementById("appModal").classList.remove("open");
@@ -2499,17 +2612,18 @@
           const id = btn.dataset.id;
           const answeredPrayer = active.find((petition) => petition.id === id);
           const prayerTitle = answeredPrayer?.title || "Answered Prayer";
-          const testimony = prompt("Record a brief testimony of how God answered this prayer:") || "Answered by the faithfulness of God.";
+          const testimony = await showMemorialStoneModal();
+          if (testimony === null) return;
           try {
             await updateDoc(doc(db, "users", currentUser.uid, "petitions", id), {
               status: "answered",
               testimony,
               answeredAt: serverTimestamp()
             });
-            loadHouseOfPrayer();
+            await loadHouseOfPrayer();
             triggerGloryCelebration(prayerTitle);
           } catch (error) {
-            alert(`Could not record this answered prayer: ${error.message}`);
+            showToast(`Could not record this answered prayer: ${error.message}`);
           }
         });
       });
@@ -2537,7 +2651,7 @@
             }
             loadHouseOfPrayer();
           } catch (error) {
-            alert(`Could not save your agreement: ${error.message}`);
+            showToast(`Could not save your agreement: ${error.message}`);
           }
         });
       });
@@ -2546,15 +2660,21 @@
       if (notifyBtn) {
         notifyBtn.onclick = async () => {
           if (!("Notification" in window)) {
-            alert("Your browser uses the in-app Daily Thanksgiving Watch automatically every time you open the House of Prayer.");
+            showToast("Your browser uses the in-app Daily Thanksgiving Watch automatically every time you open the House of Prayer.");
             return;
           }
-          const perm = await Notification.requestPermission();
-          if (perm === "granted") {
-            new Notification("Sincere Milk & Solid Food", {
-              body: "Daily Thanksgiving Watch activated. Remember to thank God in advance for every petition on your altar!"
-            });
-            notifyBtn.textContent = "Alerts Active";
+          try {
+            const perm = await Notification.requestPermission();
+            if (perm === "granted") {
+              new Notification("Sincere Milk & Solid Food", {
+                body: "Daily Thanksgiving Watch activated. Remember to thank God in advance for every petition on your altar!"
+              });
+              notifyBtn.textContent = "Alerts Active";
+            } else if (perm === "denied") {
+              showToast("Browser notifications are off. The in-app Daily Thanksgiving Watch remains available in the House of Prayer.");
+            }
+          } catch (error) {
+            showToast(`Could not enable browser notifications: ${error.message}`);
           }
         };
       }
@@ -2676,7 +2796,7 @@
       const details = document.getElementById("petDetails").value.trim();
       const scripture = document.getElementById("petScripture").value.trim();
       if (!title || !details) {
-        alert("Please enter both a petition title and what you are trusting God for.");
+        showToast("Please enter both a petition title and what you are trusting God for.");
         return;
       }
 
@@ -2705,7 +2825,7 @@
           });
         }
       } catch (error) {
-        alert(`Could not save your petition: ${error.message}`);
+        showToast(`Could not save your petition: ${error.message}`);
         return;
       }
 
@@ -2726,14 +2846,14 @@
       const scripture = document.getElementById("auditScripture").value.trim();
       const action = document.getElementById("auditAction").value.trim();
       if (!reflect) {
-        alert("Write your Soul Audit reflection first.");
+        showToast("Write your Soul Audit reflection first.");
         return;
       }
       const entry = { reflect, scripture, action, createdAt: serverTimestamp() };
       try {
         await addDoc(collection(db, "users", currentUser.uid, "audits"), entry);
       } catch (error) {
-        alert(`Could not save your Soul Audit: ${error.message}`);
+        showToast(`Could not save your Soul Audit: ${error.message}`);
         return;
       }
       document.getElementById("auditReflect").value = "";
@@ -2795,6 +2915,108 @@
       document.getElementById("modalBody").innerHTML = htmlBody;
       document.getElementById("appModal").classList.add("open");
     }
+
+    let toastDismissTimer = null;
+    let toastTransitionTimer = null;
+
+    function dismissToast() {
+      const toast = document.getElementById("toastNotice");
+      clearTimeout(toastDismissTimer);
+      toast.classList.remove("visible");
+      clearTimeout(toastTransitionTimer);
+      toastTransitionTimer = setTimeout(() => {
+        if (!toast.classList.contains("visible")) toast.hidden = true;
+      }, 220);
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toastNotice");
+      clearTimeout(toastDismissTimer);
+      clearTimeout(toastTransitionTimer);
+      document.getElementById("toastMessage").textContent = String(message);
+      toast.hidden = false;
+      requestAnimationFrame(() => toast.classList.add("visible"));
+      toastDismissTimer = setTimeout(dismissToast, 4000);
+    }
+
+    document.getElementById("toastCloseBtn").addEventListener("click", dismissToast);
+
+    let pendingConfirmationResolve = null;
+    let confirmationReturnFocus = null;
+
+    function closeConfirmationModal(confirmed) {
+      const resolver = pendingConfirmationResolve;
+      pendingConfirmationResolve = null;
+      document.getElementById("confirmationModal").classList.remove("open");
+      if (confirmationReturnFocus?.isConnected) confirmationReturnFocus.focus();
+      confirmationReturnFocus = null;
+      if (resolver) resolver(confirmed);
+    }
+
+    function showConfirmationModal({ title, message, confirmLabel = "Confirm" }) {
+      if (pendingConfirmationResolve) closeConfirmationModal(false);
+      const modal = document.getElementById("confirmationModal");
+      document.getElementById("confirmationModalTitle").textContent = title;
+      document.getElementById("confirmationModalMessage").textContent = message;
+      document.getElementById("confirmationAcceptBtn").textContent = confirmLabel;
+      confirmationReturnFocus = document.activeElement;
+      const result = new Promise((resolve) => {
+        pendingConfirmationResolve = resolve;
+      });
+      modal.classList.add("open");
+      requestAnimationFrame(() => document.getElementById("confirmationCancelBtn").focus());
+      return result;
+    }
+
+    document.getElementById("confirmationCancelBtn").addEventListener("click", () => closeConfirmationModal(false));
+    document.getElementById("confirmationAcceptBtn").addEventListener("click", () => closeConfirmationModal(true));
+    document.getElementById("confirmationModal").addEventListener("click", (event) => {
+      if (event.target === event.currentTarget) closeConfirmationModal(false);
+    });
+
+    let pendingMemorialStoneResolve = null;
+    let memorialStoneReturnFocus = null;
+
+    function closeMemorialStoneModal(testimony = null) {
+      const resolver = pendingMemorialStoneResolve;
+      pendingMemorialStoneResolve = null;
+      document.getElementById("memorialStoneModal").classList.remove("open");
+      if (memorialStoneReturnFocus?.isConnected) memorialStoneReturnFocus.focus();
+      memorialStoneReturnFocus = null;
+      if (resolver) resolver(testimony);
+    }
+
+    function showMemorialStoneModal() {
+      if (pendingMemorialStoneResolve) closeMemorialStoneModal();
+      const modal = document.getElementById("memorialStoneModal");
+      const textarea = document.getElementById("memorialStoneTestimony");
+      textarea.value = "";
+      memorialStoneReturnFocus = document.activeElement;
+      const testimony = new Promise((resolve) => {
+        pendingMemorialStoneResolve = resolve;
+      });
+      modal.classList.add("open");
+      requestAnimationFrame(() => textarea.focus());
+      return testimony;
+    }
+
+    document.getElementById("memorialStoneCancelBtn").addEventListener("click", () => closeMemorialStoneModal());
+    document.getElementById("memorialStoneSaveBtn").addEventListener("click", () => {
+      const textarea = document.getElementById("memorialStoneTestimony");
+      const testimony = textarea.value.trim() || "Answered by the faithfulness of God.";
+      closeMemorialStoneModal(testimony);
+    });
+    document.getElementById("memorialStoneModal").addEventListener("click", (event) => {
+      if (event.target === event.currentTarget) closeMemorialStoneModal();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+      if (document.getElementById("memorialStoneModal").classList.contains("open")) {
+        closeMemorialStoneModal();
+      } else if (document.getElementById("confirmationModal").classList.contains("open")) {
+        closeConfirmationModal(false);
+      }
+    });
 
     function verseTextFromContent(content) {
       if (!Array.isArray(content)) return "";
@@ -3348,7 +3570,7 @@
         const profileSnap = await getDoc(doc(db, "users", currentUser.uid, "profile", "info"));
         if (profileSnap.exists()) profileData = profileSnap.data();
       } catch (error) {
-        alert(`Could not load your profile: ${error.message}`);
+        showToast(`Could not load your profile: ${error.message}`);
         return;
       }
 
@@ -3429,20 +3651,20 @@
         const file = event.target.files[0];
         if (!file) return;
         if (!file.type.startsWith("image/")) {
-          alert("Choose an image file for your profile photo.");
+          showToast("Choose an image file for your profile photo.");
           event.target.value = "";
           return;
         }
 
         const reader = new FileReader();
-        reader.onerror = () => alert("Could not read the selected image.");
+        reader.onerror = () => showToast("Could not read the selected image.");
         reader.onload = () => {
           if (typeof reader.result !== "string") {
-            alert("Could not read the selected image.");
+            showToast("Could not read the selected image.");
             return;
           }
           const image = new Image();
-          image.onerror = () => alert("Could not load the selected image.");
+          image.onerror = () => showToast("Could not load the selected image.");
           image.onload = () => {
             const scale = Math.min(1, 512 / Math.max(image.width, image.height));
             const canvas = document.createElement("canvas");
@@ -3450,7 +3672,7 @@
             canvas.height = Math.max(1, Math.round(image.height * scale));
             const context = canvas.getContext("2d");
             if (!context) {
-              alert("Could not process the selected image.");
+              showToast("Could not process the selected image.");
               return;
             }
             context.drawImage(image, 0, 0, canvas.width, canvas.height);
@@ -3458,7 +3680,7 @@
               customPhoto = canvas.toDataURL("image/jpeg", 0.82);
               renderProfileAvatar(photoPreview, customPhoto, document.getElementById("profileDisplayName").value || "Believer", 88);
             } catch (error) {
-              alert(`Could not process the selected image: ${error.message}`);
+              showToast(`Could not process the selected image: ${error.message}`);
             }
           };
           image.src = reader.result;
@@ -3469,7 +3691,7 @@
       document.getElementById("saveProfileBtn").addEventListener("click", async () => {
         const newDisplayName = document.getElementById("profileDisplayName").value.trim();
         if (!newDisplayName) {
-          alert("Enter a display name before saving your profile.");
+          showToast("Enter a display name before saving your profile.");
           return;
         }
         const updatedProfile = {
@@ -3486,7 +3708,7 @@
           renderAuthButton(currentUser);
           document.getElementById("appModal").classList.remove("open");
         } catch (error) {
-          alert(`Could not save your profile: ${error.message}`);
+          showToast(`Could not save your profile: ${error.message}`);
         }
       });
 
@@ -3496,7 +3718,7 @@
           resendVerificationBtn.textContent = "Verification Email Sent";
           resendVerificationBtn.disabled = true;
         } catch (error) {
-          alert(`Could not send a verification email: ${error.message}`);
+          showToast(`Could not send a verification email: ${error.message}`);
         }
       });
 
@@ -3505,7 +3727,7 @@
           await signOut(auth);
           document.getElementById("appModal").classList.remove("open");
         } catch (error) {
-          alert(`Could not sign out: ${error.message}`);
+          showToast(`Could not sign out: ${error.message}`);
         }
       });
 
@@ -3513,13 +3735,15 @@
         const btn = event.currentTarget;
         const user = auth?.currentUser;
         if (!user || user.uid !== currentUser?.uid || !functions) {
-          alert("Your account could not be verified. Please sign in again before deleting it.");
+          showToast("Your account could not be verified. Please sign in again before deleting it.");
           return;
         }
 
-        const confirmed = window.confirm(
-          "Permanently delete your account? This will remove your profile, saved verses, prayer records, and soul audits. This action cannot be undone."
-        );
+        const confirmed = await showConfirmationModal({
+          title: "Delete your account?",
+          message: "Permanently delete your profile, saved verses, prayer records, and soul audits? This action cannot be undone.",
+          confirmLabel: "Delete"
+        });
         if (!confirmed) return;
 
         btn.disabled = true;
@@ -3546,15 +3770,15 @@
           document.getElementById("appModal").classList.remove("open");
           if (auth.currentUser?.uid === user.uid) await signOut(auth);
           if (!localFeedbackCacheCleared) {
-            alert("Your account was deleted, but this browser's saved teaching feedback could not be cleared. Clear this site's browser data to remove that local copy.");
+            showToast("Your account was deleted, but this browser's saved teaching feedback could not be cleared. Clear this site's browser data to remove that local copy.");
           }
         } catch (error) {
           if (deletionComplete) {
-            alert("Your account was deleted, but this device could not complete sign-out. Reload the app to return to the sign-in screen.");
+            showToast("Your account was deleted, but this device could not complete sign-out. Reload the app to return to the sign-in screen.");
           } else if (error.code === "functions/failed-precondition" || error.code === "auth/requires-recent-login") {
-            alert("For your security, please sign out and sign back in, then try deleting your account again. No account data was deleted.");
+            showToast("For your security, please sign out and sign back in, then try deleting your account again. No account data was deleted.");
           } else {
-            alert(`Account deletion could not be completed. Some associated records may already have been removed; please try again or contact support if the problem continues. Details: ${error.message || "Unknown error"}`);
+            showToast(`Account deletion could not be completed. Some associated records may already have been removed; please try again or contact support if the problem continues. Details: ${error.message || "Unknown error"}`);
           }
         } finally {
           if (btn?.isConnected) {
@@ -3677,7 +3901,7 @@
         document.getElementById("gateRegPassword").value = "";
       } catch (error) {
         if (auth.currentUser) {
-          alert(`Your account was created, but profile setup or verification email could not be completed: ${error.message}`);
+          showToast(`Your account was created, but profile setup or verification email could not be completed: ${error.message}`);
         } else {
           showAuthGateError(`Could not create your account: ${error.message}`);
         }
@@ -3745,7 +3969,7 @@
         if (transitionId !== authTransitionId || currentUser?.uid !== user.uid) return;
         const failures = results.filter((result) => result.status === "rejected");
         if (failures.length) {
-          alert(`Some account data could not be loaded: ${failures.map((result) => result.reason?.message || "Unknown error").join("; ")}`);
+          showToast(`Some account data could not be loaded: ${failures.map((result) => result.reason?.message || "Unknown error").join("; ")}`);
         }
       });
     } else {
@@ -3783,7 +4007,7 @@
         const feelings = document.getElementById("endureFeelings").value.trim();
         const standing = document.getElementById("endureStanding").value.trim();
         if (!feelings && !standing) {
-          alert("Write a brief reflection on how you are standing in faith before saving.");
+          showToast("Write a brief reflection on how you are standing in faith before saving.");
           return;
         }
 
@@ -3804,7 +4028,7 @@
             lastEnduranceCheckDays: milestoneMark
           });
         } catch (error) {
-          alert(`Could not save your growth step: ${error.message}`);
+          showToast(`Could not save your growth step: ${error.message}`);
           return;
         }
 
