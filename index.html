@@ -220,7 +220,7 @@
 
     /* Cards & Buttons */
     .card {
-      background: var(--cream-card);
+      background: var(--cream);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 16px;
@@ -745,7 +745,7 @@
       resize: vertical;
       border: 1px solid var(--border);
       border-radius: 12px;
-      background: var(--cream-card);
+      background: var(--cream);
       color: var(--ink);
       font: inherit;
       font-size: 14px;
@@ -798,6 +798,138 @@
       line-height: 1;
       margin-top: -2px;
       padding: 0 2px;
+    }
+    .thanksgiving-seed-badge.pulse {
+      animation: seedBadgePulse 850ms ease-out;
+    }
+    @keyframes seedBadgePulse {
+      0% { box-shadow: 0 0 0 0 rgba(197, 155, 56, 0.62); transform: scale(1); }
+      45% { box-shadow: 0 0 0 7px rgba(197, 155, 56, 0); transform: scale(1.06); }
+      100% { box-shadow: 0 0 0 0 rgba(197, 155, 56, 0); transform: scale(1); }
+    }
+    .thanksgiving-celebration-backdrop {
+      z-index: 10030;
+      overflow: hidden;
+      background: radial-gradient(circle at center, rgba(61, 90, 76, 0.28), rgba(22, 24, 23, 0.92));
+    }
+    .thanksgiving-celebration-card {
+      position: relative;
+      overflow: hidden;
+      max-width: 460px;
+      padding: 27px 24px 24px;
+      background: linear-gradient(145deg, var(--charcoal-soft), var(--charcoal) 72%);
+      border: 1px solid rgba(197, 155, 56, 0.78);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      color: var(--cream);
+    }
+    .thanksgiving-celebration-card::before {
+      position: absolute;
+      top: -150px;
+      left: 50%;
+      width: 310px;
+      height: 310px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(197, 155, 56, 0.2), rgba(197, 155, 56, 0) 70%);
+      content: "";
+      pointer-events: none;
+      transform: translateX(-50%);
+    }
+    .thanksgiving-celebration-content {
+      position: relative;
+      z-index: 1;
+    }
+    .thanksgiving-celebration-eyebrow {
+      display: block;
+      margin-bottom: 8px;
+      color: #E8C66F;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+      line-height: 1.5;
+      text-transform: uppercase;
+    }
+    .thanksgiving-celebration-title {
+      margin-bottom: 12px;
+      color: var(--cream);
+      font-size: 31px;
+      line-height: 1;
+    }
+    .thanksgiving-celebration-message {
+      margin-bottom: 15px;
+      color: #F1EEE7;
+      font-size: 13px;
+      line-height: 1.65;
+    }
+    .thanksgiving-scripture {
+      margin-bottom: 15px;
+      padding: 11px 13px;
+      border-left: 2px solid var(--gold);
+      border-radius: 0 9px 9px 0;
+      background: rgba(250, 247, 242, 0.07);
+    }
+    .thanksgiving-scripture-reference {
+      display: block;
+      margin-bottom: 4px;
+      color: #E8C66F;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .thanksgiving-scripture-text {
+      color: var(--cream);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .thanksgiving-seed-count {
+      display: block;
+      width: fit-content;
+      margin: 0 auto 18px;
+      padding: 7px 12px;
+      border: 1px solid rgba(232, 198, 111, 0.6);
+      border-radius: 999px;
+      background: rgba(197, 155, 56, 0.14);
+      color: #F4D98C;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+    .thanksgiving-continue-btn {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid #E8C66F;
+      background: linear-gradient(135deg, #D8B354, var(--gold));
+      color: var(--charcoal);
+      font-weight: 700;
+    }
+    .thanksgiving-shimmer {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .thanksgiving-particle {
+      position: absolute;
+      top: var(--particle-y);
+      left: var(--particle-x);
+      width: var(--particle-size);
+      height: var(--particle-size);
+      border-radius: 50%;
+      background: #E8C66F;
+      box-shadow: 0 0 12px rgba(232, 198, 111, 0.72);
+      opacity: 0;
+      animation: goldenShimmer 1.8s ease-out var(--particle-delay) both;
+    }
+    @keyframes goldenShimmer {
+      0% { opacity: 0; transform: translate(0, 10px) scale(0.35); }
+      28% { opacity: 0.8; }
+      100% { opacity: 0; transform: translate(var(--particle-dx), -32px) scale(0.08); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .thanksgiving-seed-badge.pulse,
+      .thanksgiving-particle {
+        animation-duration: 0.01ms;
+      }
     }
     .badge {
       display: inline-block;
@@ -1047,7 +1179,7 @@
       <div id="thanksgivingWatchBox" style="display:none; background:linear-gradient(135deg, #FBF6EA 0%, #EDF2EF 100%); border:1.5px solid var(--gold); border-radius:16px; padding:14px 16px; margin-bottom:16px;">
         <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px;">
           <span style="font-size:10px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold-deep);">Daily Thanksgiving Watch • Mark 11:24</span>
-          <button id="enableNotifyBtn" type="button" style="background:var(--charcoal); color:#FFFFFF; border:none; border-radius:999px; padding:4px 10px; font-size:10px; font-weight:700; cursor:pointer;">Enable Alerts</button>
+          <button id="enableNotifyBtn" type="button" style="background:var(--charcoal); color:#FFFFFF; border:none; border-radius:999px; padding:4px 10px; font-size:10px; font-weight:700; cursor:pointer;">Daily Watch Info</button>
         </div>
         <div id="thanksgivingWatchList"></div>
       </div>
@@ -1315,10 +1447,10 @@
 
   <div id="memorialStoneModal" class="modal-backdrop custom-dialog-backdrop" role="dialog" aria-modal="true" aria-labelledby="memorialStoneTitle">
     <div class="modal-card">
-      <span class="memorial-dialog-eyebrow">Memorial Stone • Testimony</span>
+      <span class="memorial-dialog-eyebrow">MEMORIAL STONE • TESTIMONY</span>
       <h3 id="memorialStoneTitle" class="serif" style="font-size:30px; color:var(--charcoal); line-height:1.05; margin-bottom:16px;">Record How God Answered</h3>
       <label for="memorialStoneTestimony" style="display:block; font-size:12px; font-weight:700; color:var(--sage-deep); margin-bottom:7px;">Your testimony</label>
-      <textarea id="memorialStoneTestimony" class="memorial-testimony-textarea" rows="4" placeholder="Write your testimony of God's faithfulness..."></textarea>
+      <textarea id="memorialStoneTestimony" class="memorial-testimony-textarea" rows="4" placeholder="Record a brief testimony of how God answered this prayer..."></textarea>
       <div class="confirmation-actions">
         <button id="memorialStoneCancelBtn" class="btn btn-outline btn-sm" type="button">Cancel</button>
         <button id="memorialStoneSaveBtn" class="btn btn-gold btn-sm" type="button">Save Memorial Stone</button>
@@ -1329,6 +1461,23 @@
   <div id="toastNotice" class="toast-notice" role="status" aria-live="polite" aria-atomic="true" hidden>
     <span id="toastMessage" class="toast-message"></span>
     <button id="toastCloseBtn" class="toast-close" type="button" aria-label="Dismiss notification">&times;</button>
+  </div>
+
+  <div id="thanksgivingCelebrationModal" class="modal-backdrop custom-dialog-backdrop thanksgiving-celebration-backdrop" role="dialog" aria-modal="true" aria-labelledby="thanksgivingCelebrationTitle" aria-describedby="thanksgivingCelebrationMessage">
+    <div class="modal-card thanksgiving-celebration-card">
+      <div id="thanksgivingShimmer" class="thanksgiving-shimmer" aria-hidden="true"></div>
+      <div class="thanksgiving-celebration-content">
+        <span class="thanksgiving-celebration-eyebrow">SEED OF THANKSGIVING SOWN • FAITH IN ACTION</span>
+        <h3 id="thanksgivingCelebrationTitle" class="serif thanksgiving-celebration-title">Well Done — Keep Standing in Faith</h3>
+        <p id="thanksgivingCelebrationMessage" class="thanksgiving-celebration-message"></p>
+        <div class="thanksgiving-scripture">
+          <span id="thanksgivingScriptureReference" class="thanksgiving-scripture-reference"></span>
+          <p id="thanksgivingScriptureText" class="thanksgiving-scripture-text"></p>
+        </div>
+        <span id="thanksgivingSeedCount" class="thanksgiving-seed-count"></span>
+        <button id="thanksgivingContinueBtn" class="btn thanksgiving-continue-btn" type="button">Amen — Continue Standing</button>
+      </div>
+    </div>
   </div>
 
   <!-- Firebase SDK & Application Logic -->
@@ -2365,7 +2514,11 @@
       const today = getTodayKey();
       const entry = thanksgivingLog[prayerId] || { count: 0, lastDate: "" };
       if (entry.lastDate === today) {
-        showToast(`You have already offered a prayer of thanksgiving today for "${prayerTitle}". Keep standing in faith!`);
+        showThanksgivingCelebration({
+          prayerTitle,
+          count: entry.count,
+          alreadySown: true
+        });
         return;
       }
 
@@ -2405,7 +2558,16 @@
           return;
         }
         document.getElementById("appModal").classList.remove("open");
-        loadHouseOfPrayer();
+        try {
+          await loadHouseOfPrayer();
+        } catch (error) {
+          showToast(`Your thanksgiving seed was saved, but the altar could not refresh: ${error.message}`);
+        }
+        pulseThanksgivingSeedBadge(prayerId);
+        showThanksgivingCelebration({
+          prayerTitle,
+          count: entry.count + 1
+        });
       });
     }
 
@@ -2517,7 +2679,7 @@
           <div class="card">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:6px;">
               <span class="badge" style="margin-bottom:0;">${p.category} ${p.visibility === "corporate" ? "• Shared in Agreement" : "• Private Altar"}</span>
-              <span class="badge" style="margin-bottom:0; background:var(--gold-tint); color:var(--gold-deep); border:1px solid rgba(197,155,56,0.45);">&#128588; ${tLog.count} Thanksgiving ${tLog.count === 1 ? "Seed" : "Seeds"} Sown</span>
+              <span class="badge thanksgiving-seed-badge" data-thanksgiving-id="${p.id}" style="margin-bottom:0; background:var(--gold-tint); color:var(--gold-deep); border:1px solid rgba(197,155,56,0.45);">&#128588; ${tLog.count} Thanksgiving ${tLog.count === 1 ? "Seed" : "Seeds"} Sown</span>
             </div>
             <h3 style="font-size:20px; margin-bottom:6px;">${p.title}</h3>
             <p style="font-size:13px; color:var(--ink); line-height:1.5; margin-bottom:8px;">${p.details}</p>
@@ -2548,7 +2710,7 @@
           <div class="card">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:6px;">
               <span class="badge" style="margin-bottom:0;">${c.category} • Posted by ${c.authorName || "A Fellow Believer"}</span>
-              ${isAgreed ? `<span class="badge" style="margin-bottom:0; background:var(--gold-tint); color:var(--gold-deep); border:1px solid rgba(197,155,56,0.45);">&#128588; ${tLog.count} Thanksgiving ${tLog.count === 1 ? "Seed" : "Seeds"} Sown</span>` : ""}
+              ${isAgreed ? `<span class="badge thanksgiving-seed-badge" data-thanksgiving-id="${c.id}" style="margin-bottom:0; background:var(--gold-tint); color:var(--gold-deep); border:1px solid rgba(197,155,56,0.45);">&#128588; ${tLog.count} Thanksgiving ${tLog.count === 1 ? "Seed" : "Seeds"} Sown</span>` : ""}
             </div>
             <h3 style="font-size:20px; margin-bottom:6px;">${c.title}</h3>
             <p style="font-size:13px; color:var(--ink); line-height:1.5; margin-bottom:8px;">${c.details}</p>
@@ -2658,24 +2820,8 @@
 
       const notifyBtn = document.getElementById("enableNotifyBtn");
       if (notifyBtn) {
-        notifyBtn.onclick = async () => {
-          if (!("Notification" in window)) {
-            showToast("Your browser uses the in-app Daily Thanksgiving Watch automatically every time you open the House of Prayer.");
-            return;
-          }
-          try {
-            const perm = await Notification.requestPermission();
-            if (perm === "granted") {
-              new Notification("Sincere Milk & Solid Food", {
-                body: "Daily Thanksgiving Watch activated. Remember to thank God in advance for every petition on your altar!"
-              });
-              notifyBtn.textContent = "Alerts Active";
-            } else if (perm === "denied") {
-              showToast("Browser notifications are off. The in-app Daily Thanksgiving Watch remains available in the House of Prayer.");
-            }
-          } catch (error) {
-            showToast(`Could not enable browser notifications: ${error.message}`);
-          }
+        notifyBtn.onclick = () => {
+          showToast("Your browser uses the in-app Daily Thanksgiving Watch automatically every time you open the House of Prayer.");
         };
       }
     }
@@ -2977,6 +3123,94 @@
     let pendingMemorialStoneResolve = null;
     let memorialStoneReturnFocus = null;
 
+    const thanksgivingScriptures = [
+      {
+        reference: "Philippians 4:6–7",
+        text: "Bring every request to God with thanksgiving, and let His peace guard your heart and mind."
+      },
+      {
+        reference: "Hebrews 10:35–36",
+        text: "Do not throw away your confidence; keep going with endurance as you wait for what God has promised."
+      },
+      {
+        reference: "1 Thessalonians 5:18",
+        text: "Give thanks in every circumstance; this is God's will for you in Christ Jesus."
+      },
+      {
+        reference: "Mark 11:24",
+        text: "Pray with faith, trusting God as you bring your requests before Him."
+      }
+    ];
+    let thanksgivingScriptureIndex = 0;
+    let thanksgivingCelebrationReturnFocus = null;
+
+    function pulseThanksgivingSeedBadge(prayerId) {
+      document.querySelectorAll(".thanksgiving-seed-badge").forEach((badge) => {
+        if (badge.dataset.thanksgivingId !== prayerId) return;
+        badge.classList.remove("pulse");
+        void badge.offsetWidth;
+        badge.classList.add("pulse");
+        setTimeout(() => badge.classList.remove("pulse"), 900);
+      });
+    }
+
+    function showThanksgivingCelebration({ prayerTitle, count, alreadySown = false }) {
+      const modal = document.getElementById("thanksgivingCelebrationModal");
+      const message = alreadySown
+        ? "Today's seed of thanksgiving is already before the Lord — do not grow weary in doing good"
+        : `You offered thanks for "${prayerTitle}" in faith. Even when you feel weary, choosing thanksgiving is an act of spiritual maturity and authority. Your seed is an expression of trust as you keep standing.`;
+      const scripture = thanksgivingScriptures[thanksgivingScriptureIndex];
+      thanksgivingScriptureIndex = (thanksgivingScriptureIndex + 1) % thanksgivingScriptures.length;
+
+      document.getElementById("thanksgivingCelebrationMessage").textContent = message;
+      document.getElementById("thanksgivingScriptureReference").textContent = scripture.reference;
+      document.getElementById("thanksgivingScriptureText").textContent = scripture.text;
+      const seedCount = Math.max(0, Number(count) || 0);
+      document.getElementById("thanksgivingSeedCount").textContent =
+        `${seedCount} Thanksgiving ${seedCount === 1 ? "Seed" : "Seeds"} Sown`;
+      thanksgivingCelebrationReturnFocus = document.activeElement;
+
+      const shimmer = document.getElementById("thanksgivingShimmer");
+      shimmer.replaceChildren();
+      [
+        [12, 24, 3, -12, 0],
+        [24, 42, 2, 10, 90],
+        [38, 18, 3, -8, 160],
+        [54, 35, 2, 12, 40],
+        [68, 20, 2, -10, 130],
+        [82, 43, 3, 9, 210],
+        [18, 66, 2, -10, 110],
+        [34, 78, 3, 11, 20],
+        [52, 70, 2, -9, 180],
+        [72, 81, 3, 8, 70],
+        [88, 63, 2, -11, 150],
+        [44, 49, 2, 9, 240]
+      ].forEach(([x, y, size, drift, delay]) => {
+        const particle = document.createElement("span");
+        particle.className = "thanksgiving-particle";
+        particle.style.setProperty("--particle-x", `${x}%`);
+        particle.style.setProperty("--particle-y", `${y}%`);
+        particle.style.setProperty("--particle-size", `${size}px`);
+        particle.style.setProperty("--particle-dx", `${drift}px`);
+        particle.style.setProperty("--particle-delay", `${delay}ms`);
+        shimmer.appendChild(particle);
+      });
+
+      modal.classList.add("open");
+      requestAnimationFrame(() => document.getElementById("thanksgivingContinueBtn").focus());
+    }
+
+    function closeThanksgivingCelebration() {
+      document.getElementById("thanksgivingCelebrationModal").classList.remove("open");
+      if (thanksgivingCelebrationReturnFocus?.isConnected) thanksgivingCelebrationReturnFocus.focus();
+      thanksgivingCelebrationReturnFocus = null;
+    }
+
+    document.getElementById("thanksgivingContinueBtn").addEventListener("click", closeThanksgivingCelebration);
+    document.getElementById("thanksgivingCelebrationModal").addEventListener("click", (event) => {
+      if (event.target === event.currentTarget) closeThanksgivingCelebration();
+    });
+
     function closeMemorialStoneModal(testimony = null) {
       const resolver = pendingMemorialStoneResolve;
       pendingMemorialStoneResolve = null;
@@ -3011,7 +3245,9 @@
     });
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape") return;
-      if (document.getElementById("memorialStoneModal").classList.contains("open")) {
+      if (document.getElementById("thanksgivingCelebrationModal").classList.contains("open")) {
+        closeThanksgivingCelebration();
+      } else if (document.getElementById("memorialStoneModal").classList.contains("open")) {
         closeMemorialStoneModal();
       } else if (document.getElementById("confirmationModal").classList.contains("open")) {
         closeConfirmationModal(false);
