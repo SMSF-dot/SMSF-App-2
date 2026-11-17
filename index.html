@@ -1020,7 +1020,7 @@
 
     .bible-chapter-nav {
       display: grid;
-      grid-template-columns: 34px minmax(0, 1.25fr) minmax(72px, 0.8fr) 34px;
+      grid-template-columns: 34px minmax(75px, 1.25fr) minmax(60px, 0.8fr) 34px;
       align-items: center;
       gap: 5px;
       padding: 5px;
@@ -1154,6 +1154,11 @@
 
     .bible-reader[data-reading-mode="night"] .bible-reading-mode button { color: #DED8CD; }
 
+    .bible-reader[data-reading-mode="night"] .bible-reading-mode {
+      background: #202520;
+      border-color: rgba(197, 160, 89, 0.42);
+    }
+
     .bible-reader[data-reading-mode="night"] .bible-reading-mode button.active {
       background: #2A302B;
       color: #F0D88D;
@@ -1207,11 +1212,13 @@
 
     .bible-verse-number {
       flex: 0 0 auto;
+      position: relative;
+      top: -0.2em;
       color: #C5A059;
       font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 11px;
+      font-size: 0.68em;
       font-weight: 600;
-      line-height: inherit;
+      line-height: 1;
     }
 
     .bible-verse-copy {
@@ -1355,6 +1362,22 @@
     }
 
     .scripture-action-buttons button:disabled { opacity: 0.55; cursor: wait; }
+
+    @media (max-width: 380px) {
+      .bible-reading-mode button {
+        padding: 7px 7px;
+        font-size: 9px;
+      }
+
+      .bible-chapter-nav {
+        grid-template-columns: 30px minmax(75px, 1.25fr) minmax(60px, 0.8fr) 30px;
+        gap: 4px;
+      }
+
+      .scripture-action-pill { width: calc(100vw - 20px); }
+      .scripture-action-buttons { gap: 3px; }
+      .scripture-action-buttons button { font-size: 9px; }
+    }
 
     .scripture-highlight-pill {
       background: rgba(197, 155, 56, 0.14) !important;
@@ -2091,29 +2114,44 @@
         <button class="bible-view-btn" data-view="saved" type="button" aria-pressed="false">Saved &amp; Highlighted</button>
       </div>
       <div id="bibleReader" class="bible-reader" data-reading-mode="parchment">
-        <div class="bible-reader-controls">
+        <div class="bible-reader-atmosphere">
+          <span class="bible-reader-eyebrow">The Word • Berean Standard Bible</span>
+        </div>
+        <div class="bible-chapter-nav" role="group" aria-label="Bible chapter navigation">
+          <button id="biblePreviousChapterBtn" type="button" aria-label="Previous Chapter" title="Previous Chapter">&larr;</button>
           <label class="sr-only" for="bibleBookSelect">Bible book</label>
           <select id="bibleBookSelect" aria-label="Bible book"></select>
           <label class="sr-only" for="bibleChapterSelect">Chapter</label>
           <select id="bibleChapterSelect" aria-label="Chapter"></select>
+          <button id="bibleNextChapterBtn" type="button" aria-label="Next Chapter" title="Next Chapter">&rarr;</button>
         </div>
-        <div class="bible-reader-controls" style="grid-template-columns:1fr 1fr; margin-top:-4px;">
-          <button id="biblePreviousChapterBtn" class="btn btn-outline btn-sm" type="button">&larr; Previous</button>
-          <button id="bibleNextChapterBtn" class="btn btn-outline btn-sm" type="button">Next &rarr;</button>
+        <div class="bible-reading-progress" role="progressbar" aria-label="Chapter reading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <span id="bibleReadingProgressFill"></span>
         </div>
         <div class="bible-reading-mode" role="group" aria-label="Bible reading mode">
-          <button class="bible-mode-btn active" data-mode="parchment" type="button">Cream Parchment</button>
-          <button class="bible-mode-btn" data-mode="night" type="button">Charcoal Night Watch</button>
+          <button class="bible-mode-btn active" data-mode="parchment" type="button" aria-pressed="true">Cream Parchment</button>
+          <button class="bible-mode-btn" data-mode="night" type="button" aria-pressed="false">Charcoal Night Watch</button>
         </div>
-        <p id="bibleReaderStatus" style="font-size:12px; color:var(--ink-muted); margin-bottom:8px;" aria-live="polite"></p>
+        <p id="bibleReaderStatus" class="bible-reader-status" aria-live="polite"></p>
         <div id="bibleChapterContent" aria-live="polite"></div>
-        <div class="bible-reader-controls" style="grid-template-columns:1fr; margin-top:12px;">
-          <button id="bibleNextChapterBottomBtn" class="btn btn-outline btn-sm" type="button">Next Chapter &rarr;</button>
+        <div class="bible-next-chapter-wrap">
+          <button id="bibleNextChapterBottomBtn" class="btn bible-next-chapter-btn" type="button">Next Chapter &rarr;</button>
         </div>
         <p style="font-size:10px; color:var(--ink-muted); margin-top:14px;">Berean Standard Bible · Public domain · bible.helloao.org</p>
       </div>
       <div id="bibleSavedContainer" hidden></div>
     </section>
+
+    <div id="bibleScriptureActionPill" class="scripture-action-pill" role="group" aria-label="Selected scripture actions" hidden>
+      <span id="bibleScriptureActionReference" class="scripture-action-reference"></span>
+      <div class="scripture-action-buttons">
+        <button id="bibleActionHighlightBtn" type="button" aria-pressed="false">Highlight</button>
+        <button id="bibleActionLoveBtn" type="button" aria-pressed="false">Love</button>
+        <button id="bibleActionStudyBtn" type="button">Study</button>
+        <button id="bibleActionCopyBtn" type="button">Copy</button>
+      </div>
+      <span id="bibleScriptureActionStatus" class="sr-only" role="status" aria-live="polite"></span>
+    </div>
 
     <!-- SCREEN 6: LIBRARY (BOOKS & GUIDES) -->
     <section id="screen-library" class="screen">
@@ -2343,6 +2381,8 @@
     let lovedVerses = new Map();
     let highlightedVerses = new Map();
     let currentBibleChapter = null;
+    let selectedBibleVerse = null;
+    let bibleProgressFrame = 0;
     let dailyMannaVerse = null;
     const DAILY_MANNA_REFERENCES = [
       "Hebrews 5:14",
@@ -4288,6 +4328,8 @@
       document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
       document.getElementById(`screen-${name}`).classList.add("active");
       document.querySelectorAll(".nav-item").forEach((n) => n.classList.toggle("active", n.dataset.screen === name));
+      if (name === "bible") scheduleBibleReadingProgress();
+      else hideBibleVerseActionPill();
     }
 
     document.querySelectorAll("[data-home-screen]").forEach((button) => {
@@ -4822,11 +4864,125 @@
       return false;
     }
 
+    function hideBibleVerseActionPill() {
+      selectedBibleVerse = null;
+      document.querySelectorAll(".bible-verse.is-selected").forEach((verse) => {
+        verse.classList.remove("is-selected");
+        verse.setAttribute("aria-pressed", "false");
+      });
+      const pill = document.getElementById("bibleScriptureActionPill");
+      if (pill) pill.hidden = true;
+    }
+
+    function updateBibleVerseActionPill() {
+      const pill = document.getElementById("bibleScriptureActionPill");
+      if (!pill || !selectedBibleVerse) {
+        if (pill) pill.hidden = true;
+        return;
+      }
+
+      pill.hidden = false;
+      document.getElementById("bibleScriptureActionReference").textContent = selectedBibleVerse.reference;
+      const key = scriptureStorageKey(selectedBibleVerse.reference);
+      document.getElementById("bibleActionHighlightBtn").setAttribute("aria-pressed", String(highlightedVerses.has(key)));
+      document.getElementById("bibleActionLoveBtn").setAttribute("aria-pressed", String(lovedVerses.has(key)));
+    }
+
+    function updateBibleReadingProgress() {
+      const progress = document.querySelector(".bible-reading-progress");
+      const fill = document.getElementById("bibleReadingProgressFill");
+      const chapterContent = document.getElementById("bibleChapterContent");
+      const bibleScreen = document.getElementById("screen-bible");
+      if (!progress || !fill || !chapterContent || !bibleScreen) return;
+
+      if (!bibleScreen.classList.contains("active") || document.getElementById("bibleReader").hidden || !chapterContent.childElementCount) {
+        fill.style.transform = "scaleX(0)";
+        progress.setAttribute("aria-valuenow", "0");
+        return;
+      }
+
+      const chapterTop = chapterContent.getBoundingClientRect().top + window.scrollY;
+      const chapterHeight = chapterContent.offsetHeight;
+      const readingPosition = window.scrollY + window.innerHeight * 0.32;
+      const percentage = Math.round(Math.max(0, Math.min(1, (readingPosition - chapterTop) / Math.max(1, chapterHeight))) * 100);
+      fill.style.transform = `scaleX(${percentage / 100})`;
+      progress.setAttribute("aria-valuenow", String(percentage));
+    }
+
+    function scheduleBibleReadingProgress() {
+      if (bibleProgressFrame) return;
+      bibleProgressFrame = requestAnimationFrame(() => {
+        bibleProgressFrame = 0;
+        updateBibleReadingProgress();
+      });
+    }
+
+    function scrollBibleReaderToTop() {
+      const behavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+      window.scrollTo({ top: 0, behavior });
+    }
+
+    function navigateBibleChapter(bookCode, chapterNumber) {
+      hideBibleVerseActionPill();
+      scrollBibleReaderToTop();
+      loadBibleChapter(bookCode, chapterNumber);
+    }
+
+    async function saveSelectedBibleVerse(kind) {
+      if (!selectedBibleVerse) return;
+      const selected = selectedBibleVerse;
+      const savedMap = kind === "loved" ? lovedVerses : highlightedVerses;
+      const key = scriptureStorageKey(selected.reference);
+      const wasSaved = savedMap.has(key);
+      const button = document.getElementById(kind === "loved" ? "bibleActionLoveBtn" : "bibleActionHighlightBtn");
+      button.disabled = true;
+      try {
+        await toggleSavedScripture(kind, selected.reference, selected.text);
+        const isSaved = savedMap.has(key);
+        if (isSaved !== wasSaved) {
+          showToast(kind === "loved"
+            ? (isSaved ? `${selected.reference} was added to Loved Scriptures.` : `${selected.reference} was removed from Loved Scriptures.`)
+            : (isSaved ? `${selected.reference} was highlighted.` : `${selected.reference} highlight was removed.`));
+        }
+      } catch (error) {
+        showToast(`Could not update ${selected.reference}: ${error.message}`);
+      } finally {
+        button.disabled = false;
+        if (selectedBibleVerse?.reference === selected.reference) updateBibleVerseActionPill();
+      }
+    }
+
+    async function copySelectedBibleVerse() {
+      if (!selectedBibleVerse) return;
+      const { reference, text } = selectedBibleVerse;
+      const copyText = `${reference} — ${text}`;
+      try {
+        if (navigator.clipboard?.writeText && window.isSecureContext) {
+          await navigator.clipboard.writeText(copyText);
+        } else {
+          const temporaryInput = document.createElement("textarea");
+          temporaryInput.value = copyText;
+          temporaryInput.setAttribute("readonly", "");
+          temporaryInput.style.position = "fixed";
+          temporaryInput.style.opacity = "0";
+          document.body.appendChild(temporaryInput);
+          temporaryInput.select();
+          const copied = document.execCommand("copy");
+          temporaryInput.remove();
+          if (!copied) throw new Error("Clipboard access is unavailable in this browser.");
+        }
+        showToast(`${reference} copied to the clipboard.`);
+      } catch (error) {
+        showToast(`Could not copy ${reference}: ${error.message}`);
+      }
+    }
+
     function renderBibleChapter(chapter, book, chapterNumber) {
       const container = document.getElementById("bibleChapterContent");
       container.innerHTML = chapter.verses.map((verse) => {
         const reference = `${book.name} ${chapterNumber}:${verse.number}`;
         const highlighted = verseMatchesSavedHighlight(book.code, chapterNumber, verse.number);
+        const selected = selectedBibleVerse?.reference === reference;
         const cherub = highlighted ? `<svg class="peeking-cherub" width="68" height="36" viewBox="0 0 80 42" fill="none" style="position:absolute; top:-26px; right:18px; pointer-events:none; filter:drop-shadow(0 2px 4px rgba(22,24,23,0.12));">
   <path d="M27 25C17 23 9 16 7 9C13 10 20 13 26 18" fill="#FAF7F2" stroke="#C59B38" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
   <path d="M24 28C16 28 11 24 9 19C14 19 19 21 24 24" fill="#FAF7F2" stroke="#C59B38" stroke-width="1.5" stroke-linecap="round"/>
@@ -4841,24 +4997,53 @@
   <rect x="28" y="27.5" width="7" height="5.5" rx="2.8" fill="#FAF7F2" stroke="#C59B38" stroke-width="1.6"/>
   <rect x="45" y="27.5" width="7" height="5.5" rx="2.8" fill="#FAF7F2" stroke="#C59B38" stroke-width="1.6"/>
 </svg>` : "";
-        return `<div id="bible-verse-${verse.number}" data-verse="${verse.number}" class="bible-verse${highlighted ? " highlighted" : ""}">
+        return `<div id="bible-verse-${verse.number}" data-verse="${verse.number}" class="bible-verse${highlighted ? " highlighted" : ""}${selected ? " is-selected" : ""}" role="button" tabindex="0" aria-label="Select ${escapeHTML(reference)}" aria-pressed="${selected}">
           ${cherub}
-          <button class="bible-verse-number" type="button" aria-label="Actions for ${escapeHTML(reference)}">${verse.number}</button>
-          <span>${escapeHTML(verse.text)}</span>
+          <span class="bible-verse-number" aria-hidden="true">${verse.number}</span>
+          <span class="bible-verse-copy">${escapeHTML(verse.text)}</span>
         </div>`;
       }).join("");
       container.querySelectorAll("[data-verse]").forEach((verseElement) => {
-        verseElement.addEventListener("click", () => {
+        const selectVerse = () => {
           const verseNumber = Number(verseElement.dataset.verse);
           const verse = chapter.verses.find((item) => item.number === verseNumber);
-          if (verse) openBibleVerseInteractiveModal(book.name, chapterNumber, verseNumber, verse.text);
+          if (!verse) return;
+          const reference = `${book.name} ${chapterNumber}:${verse.number}`;
+          if (selectedBibleVerse?.reference === reference) {
+            hideBibleVerseActionPill();
+            return;
+          }
+          document.querySelectorAll(".bible-verse.is-selected").forEach((element) => {
+            element.classList.remove("is-selected");
+            element.setAttribute("aria-pressed", "false");
+          });
+          selectedBibleVerse = {
+            bookName: book.name,
+            bookCode: book.code,
+            chapterNumber,
+            verseNumber: verse.number,
+            reference,
+            text: verse.text
+          };
+          verseElement.classList.add("is-selected");
+          verseElement.setAttribute("aria-pressed", "true");
+          updateBibleVerseActionPill();
+        };
+        verseElement.addEventListener("click", selectVerse);
+        verseElement.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            selectVerse();
+          }
         });
       });
+      updateBibleVerseActionPill();
     }
 
     async function loadBibleChapter(bookCode, chapterNumber, targetVerses = []) {
       const book = BIBLE_BOOK_BY_CODE.get(bookCode);
       if (!book) return;
+      hideBibleVerseActionPill();
       const status = document.getElementById("bibleReaderStatus");
       const container = document.getElementById("bibleChapterContent");
       document.getElementById("bibleBookSelect").value = book.code;
@@ -4877,6 +5062,7 @@
         currentBibleChapter = { bookCode: book.code, chapterNumber, chapter };
         renderBibleChapter(chapter, book, chapterNumber);
         status.textContent = `${book.name} ${chapterNumber} · Berean Standard Bible`;
+        scheduleBibleReadingProgress();
         const validTargetVerses = Array.isArray(targetVerses) ? targetVerses : [targetVerses];
         validTargetVerses.forEach((verseNumber) => {
           const target = container.querySelector(`[data-verse="${verseNumber}"]`);
@@ -4890,6 +5076,7 @@
         }
       } catch (error) {
         status.textContent = `Could not load this chapter: ${error.message}`;
+        scheduleBibleReadingProgress();
       }
     }
 
@@ -4907,12 +5094,12 @@
       bookSelect.addEventListener("change", () => loadBibleChapter(bookSelect.value, 1));
       document.getElementById("biblePreviousChapterBtn").addEventListener("click", () => {
         if (currentBibleChapter && currentBibleChapter.chapterNumber > 1) {
-          loadBibleChapter(currentBibleChapter.bookCode, currentBibleChapter.chapterNumber - 1);
+          navigateBibleChapter(currentBibleChapter.bookCode, currentBibleChapter.chapterNumber - 1);
         }
       });
       document.getElementById("bibleNextChapterBtn").addEventListener("click", () => {
         if (currentBibleChapter && currentBibleChapter.chapterNumber < BIBLE_BOOK_BY_CODE.get(currentBibleChapter.bookCode).chapters) {
-          loadBibleChapter(currentBibleChapter.bookCode, currentBibleChapter.chapterNumber + 1);
+          navigateBibleChapter(currentBibleChapter.bookCode, currentBibleChapter.chapterNumber + 1);
         }
       });
       document.getElementById("bibleNextChapterBottomBtn").addEventListener("click", () => {
@@ -4922,14 +5109,30 @@
         button.addEventListener("click", () => {
           bibleReadingMode = button.dataset.mode;
           document.getElementById("bibleReader").dataset.readingMode = bibleReadingMode;
-          document.querySelectorAll(".bible-mode-btn").forEach((modeButton) => modeButton.classList.toggle("active", modeButton === button));
+          document.querySelectorAll(".bible-mode-btn").forEach((modeButton) => {
+            const active = modeButton === button;
+            modeButton.classList.toggle("active", active);
+            modeButton.setAttribute("aria-pressed", String(active));
+          });
         });
       });
+      document.getElementById("bibleActionHighlightBtn").addEventListener("click", () => saveSelectedBibleVerse("highlighted"));
+      document.getElementById("bibleActionLoveBtn").addEventListener("click", () => saveSelectedBibleVerse("loved"));
+      document.getElementById("bibleActionStudyBtn").addEventListener("click", () => {
+        if (!selectedBibleVerse) return;
+        const selected = selectedBibleVerse;
+        hideBibleVerseActionPill();
+        openBibleVerseInteractiveModal(selected.bookName, selected.chapterNumber, selected.verseNumber, selected.text);
+      });
+      document.getElementById("bibleActionCopyBtn").addEventListener("click", copySelectedBibleVerse);
+      window.addEventListener("scroll", scheduleBibleReadingProgress, { passive: true });
+      window.addEventListener("resize", scheduleBibleReadingProgress);
     }
 
     function setBibleView(view) {
       const savedView = view === "saved";
       if (!savedView) bibleSavedRenderSequence += 1;
+      if (savedView) hideBibleVerseActionPill();
       document.getElementById("bibleReader").hidden = savedView;
       document.getElementById("bibleSavedContainer").hidden = !savedView;
       document.querySelectorAll(".bible-view-btn").forEach((button) => {
@@ -4938,6 +5141,7 @@
         button.setAttribute("aria-pressed", String(active));
       });
       if (savedView) renderBibleSavedTreasury("all");
+      else scheduleBibleReadingProgress();
     }
 
     async function getSavedVerseText(item) {
