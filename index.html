@@ -155,12 +155,36 @@
       font-weight: 700;
       cursor: pointer;
     }
+    .auth-forgot-password {
+      display: block;
+      margin: 4px 0 0 auto;
+      padding: 4px 0;
+      border: 0;
+      background: transparent;
+      color: var(--sage-deep);
+      font: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .auth-forgot-password:hover { color: var(--gold-deep); text-decoration: underline; }
 
     .auth-gate-error {
       display: none;
       color: #8A2E22;
       background: #FBEDEA;
       border: 1px solid #E8B7AD;
+      border-radius: 9px;
+      padding: 10px 12px;
+      margin-top: 12px;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .auth-gate-success {
+      display: none;
+      color: var(--sage-deep);
+      background: var(--sage-tint);
+      border: 1px solid rgba(47, 69, 56, 0.24);
       border-radius: 9px;
       padding: 10px 12px;
       margin-top: 12px;
@@ -1277,6 +1301,7 @@
             <input id="gateSignInPassword" type="password" autocomplete="current-password" required />
             <button class="auth-password-toggle" type="button" data-password-target="gateSignInPassword" aria-label="Show password">Show</button>
           </div>
+          <button id="gateForgotPasswordBtn" class="auth-forgot-password" type="button">Forgot password?</button>
         </div>
         <div style="display:grid; gap:8px; margin-top:14px;">
           <button id="gateSignInBtn" class="btn btn-primary" type="submit">Sign In</button>
@@ -1304,6 +1329,7 @@
       </form>
 
       <div id="authGateError" class="auth-gate-error" role="alert"></div>
+      <div id="authGateStatus" class="auth-gate-success" role="status" aria-live="polite" hidden></div>
       <p class="auth-gate-footnote">Want to explore teachings and episodes freely without an account? Visit <a href="https://sinceremilksolidfood.org" target="_blank" rel="noopener noreferrer">sinceremilksolidfood.org</a>.</p>
     </div>
   </div>
@@ -1726,7 +1752,7 @@
     import {
       getAuth, onAuthStateChanged, signInWithEmailAndPassword,
       createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signOut, updateProfile,
-      sendEmailVerification
+      sendEmailVerification, sendPasswordResetEmail
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
     import {
@@ -4928,14 +4954,32 @@
 
     function showAuthGateError(message) {
       const errorBox = document.getElementById("authGateError");
+      const statusBox = document.getElementById("authGateStatus");
+      statusBox.textContent = "";
+      statusBox.hidden = true;
+      statusBox.style.display = "none";
       errorBox.textContent = message;
       errorBox.style.display = "block";
     }
 
-    function clearAuthGateError() {
+    function showAuthGateStatus(message) {
       const errorBox = document.getElementById("authGateError");
+      const statusBox = document.getElementById("authGateStatus");
       errorBox.textContent = "";
       errorBox.style.display = "none";
+      statusBox.textContent = message;
+      statusBox.hidden = false;
+      statusBox.style.display = "block";
+    }
+
+    function clearAuthGateError() {
+      const errorBox = document.getElementById("authGateError");
+      const statusBox = document.getElementById("authGateStatus");
+      errorBox.textContent = "";
+      errorBox.style.display = "none";
+      statusBox.textContent = "";
+      statusBox.hidden = true;
+      statusBox.style.display = "none";
     }
 
     function setAuthGateMode(mode) {
@@ -4960,6 +5004,40 @@
         button.textContent = showPassword ? "Hide" : "Show";
         button.setAttribute("aria-label", `${showPassword ? "Hide" : "Show"} password`);
       });
+    });
+
+    document.getElementById("gateForgotPasswordBtn").addEventListener("click", async () => {
+      clearAuthGateError();
+      if (!isFirebaseConfigured || !auth) {
+        showAuthGateError("Password reset is unavailable because Firebase is not configured.");
+        return;
+      }
+
+      const emailInput = document.getElementById("gateSignInEmail");
+      const email = emailInput.value.trim();
+      if (!email || !emailInput.checkValidity()) {
+        showAuthGateError("Enter a valid email address above, then select Forgot password.");
+        emailInput.focus();
+        return;
+      }
+
+      const resetButton = document.getElementById("gateForgotPasswordBtn");
+      resetButton.disabled = true;
+      try {
+        await sendPasswordResetEmail(auth, email);
+        showAuthGateStatus("If an account exists for this email address, a password reset link has been sent.");
+      } catch (error) {
+        if (error.code === "auth/user-not-found") {
+          showAuthGateStatus("If an account exists for this email address, a password reset link has been sent.");
+        } else if (error.code === "auth/invalid-email" || error.code === "auth/missing-email") {
+          showAuthGateError("Enter a valid email address above, then try again.");
+          emailInput.focus();
+        } else {
+          showAuthGateError(`Could not send a password reset email: ${error.message}`);
+        }
+      } finally {
+        resetButton.disabled = false;
+      }
     });
 
     document.getElementById("authGateSignInForm").addEventListener("submit", async (event) => {
