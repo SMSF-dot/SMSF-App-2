@@ -474,55 +474,113 @@
     .chamber-tabs {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-      background: #ECE6DC;
-      padding: 5px;
-      border-radius: 14px;
+      gap: 4px;
+      background: rgba(255, 253, 249, 0.94);
+      border: 1px solid rgba(197, 160, 89, 0.3);
+      padding: 4px;
+      border-radius: 999px;
       margin-bottom: 16px;
+      box-shadow: 0 5px 15px rgba(30, 34, 30, 0.055);
     }
 
     .chamber-btn {
       border: none;
       background: transparent;
       padding: 9px 6px;
-      border-radius: 10px;
-      font-size: 11px;
+      border-radius: 999px;
+      font-size: 10px;
       font-weight: 700;
       color: var(--ink-muted);
       cursor: pointer;
       line-height: 1.25;
       text-align: center;
+      transition: background 0.22s ease, color 0.22s ease, box-shadow 0.22s ease, transform 0.18s ease;
     }
 
     .chamber-btn.active {
-      background: var(--charcoal);
-      color: #FFFFFF;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.14);
+      background: #2F4538;
+      color: #FFFDF9;
+      box-shadow: 0 3px 9px rgba(30, 34, 30, 0.17), inset 0 1px 0 rgba(255, 253, 249, 0.12);
+    }
+
+    .chamber-btn:not(.active):hover {
+      background: rgba(197, 160, 89, 0.12);
+      color: #26362C;
+    }
+
+    .chamber-btn:focus-visible {
+      outline: 2px solid #C5A059;
+      outline-offset: 2px;
     }
 
     /* Altar Visual */
     .altar-sanctuary {
       background:
-        radial-gradient(ellipse at 50% 7%, rgba(197, 155, 56, 0.19), transparent 43%),
-        linear-gradient(145deg, #26362F 0%, #161817 72%);
+        radial-gradient(ellipse at 50% 15%, rgba(197, 160, 89, 0.2), transparent 45%),
+        linear-gradient(145deg, #1A211D 0%, #243029 100%);
       border-radius: 20px;
-      padding: 22px 16px 18px;
+      padding: 25px 16px 18px;
       text-align: center;
       color: var(--cream);
-      border: 1px solid rgba(197, 155, 56, 0.72);
+      border: 1px solid rgba(197, 160, 89, 0.72);
       margin-bottom: 16px;
       position: relative;
       overflow: hidden;
       box-shadow: 0 16px 34px rgba(22, 24, 23, 0.2), inset 0 1px 0 rgba(255, 249, 219, 0.08);
     }
 
+    .altar-sanctuary::before {
+      position: absolute;
+      top: -68px;
+      left: 50%;
+      width: 220px;
+      height: 190px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(220, 184, 101, 0.2), rgba(197, 160, 89, 0.06) 43%, transparent 72%);
+      content: "";
+      pointer-events: none;
+      transform: translateX(-50%);
+      animation: altarAuraPulse 5.2s ease-in-out infinite;
+    }
+
     .altar-sanctuary::after {
       position: absolute;
       inset: 6px;
-      border: 1px solid rgba(232, 198, 111, 0.16);
+      z-index: 2;
+      border: 1px solid rgba(232, 198, 111, 0.2);
       border-radius: 15px;
       content: "";
       pointer-events: none;
+    }
+
+    .altar-sanctuary > * { position: relative; z-index: 1; }
+
+    @keyframes altarAuraPulse {
+      0%, 100% { opacity: 0.58; transform: translateX(-50%) scale(0.94); }
+      50% { opacity: 1; transform: translateX(-50%) scale(1.06); }
+    }
+
+    .altar-emblem {
+      display: inline-grid;
+      place-items: center;
+      width: 66px;
+      height: 66px;
+      margin-bottom: 8px;
+      border: 1px solid rgba(232, 198, 111, 0.5);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(197, 160, 89, 0.2), rgba(197, 160, 89, 0.025) 72%);
+      box-shadow: 0 0 24px rgba(197, 160, 89, 0.16), inset 0 0 14px rgba(197, 160, 89, 0.11);
+    }
+
+    .altar-emblem svg {
+      width: 40px;
+      height: 40px;
+      color: #D8B96E;
+      filter: drop-shadow(0 0 8px rgba(232, 198, 111, 0.62));
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .altar-sanctuary::before { animation: none; }
     }
 
     .altar-stone {
@@ -583,18 +641,21 @@
     }
     .altar-stat-tile {
       min-width: 0;
-      padding: 9px 5px;
-      border: 1px solid rgba(232, 198, 111, 0.25);
-      border-radius: 11px;
-      background: rgba(250, 247, 242, 0.055);
+      padding: 10px 5px;
+      border: 1px solid rgba(197, 160, 89, 0.45);
+      border-radius: 12px;
+      background: rgba(255, 253, 249, 0.075);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
       color: inherit;
       font: inherit;
       font-size: 10px;
       line-height: 1.35;
       cursor: pointer;
-      transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+      transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
     }
-    .altar-stat-tile:hover { background: rgba(197, 155, 56, 0.13); border-color: rgba(232, 198, 111, 0.6); transform: translateY(-1px); }
+    .altar-stat-tile:hover { background: rgba(197, 160, 89, 0.16); border-color: rgba(232, 198, 111, 0.78); box-shadow: 0 7px 16px rgba(9, 13, 11, 0.2); transform: translateY(-2px); }
+    .altar-stat-tile:active { transform: translateY(0); }
     .altar-stats strong { color: #F4D98C; font-size: 17px; display: block; margin-bottom: 2px; }
     #chamber-personal, #chamber-corporate, #chamber-remembrance { scroll-margin-top: 18px; }
     .corporate-feed {
@@ -622,13 +683,13 @@
       text-underline-offset: 3px;
     }
     .memorial-stone[tabindex="0"] { cursor: pointer; transition: box-shadow 0.2s ease, transform 0.2s ease; }
-    .memorial-stone[tabindex="0"]:hover { box-shadow: 0 9px 24px rgba(128, 97, 34, 0.15); transform: translateY(-1px); }
+    .memorial-stone[tabindex="0"]:hover { box-shadow: inset 0 0 0 1px rgba(197, 160, 89, 0.46), 0 9px 24px rgba(128, 97, 34, 0.15); transform: translateY(-1px); }
     .memorial-stone[tabindex="0"]:focus-visible { outline: 2px solid var(--sage); outline-offset: 3px; }
     .memorial-stone.is-celebrating { animation: memorialStoneGlow 1.15s ease-out; }
     @keyframes memorialStoneGlow {
-      0% { box-shadow: 0 0 0 0 rgba(197, 155, 56, 0.62); }
-      55% { box-shadow: 0 0 26px 8px rgba(197, 155, 56, 0.24); }
-      100% { box-shadow: 0 0 0 0 rgba(197, 155, 56, 0); }
+      0% { box-shadow: inset 0 0 0 1px rgba(197, 160, 89, 0.42), 0 0 0 0 rgba(197, 160, 89, 0.62); }
+      55% { box-shadow: inset 0 0 0 1px rgba(197, 160, 89, 0.54), 0 0 26px 8px rgba(197, 160, 89, 0.24); }
+      100% { box-shadow: inset 0 0 0 1px rgba(197, 160, 89, 0.42), 0 0 0 0 rgba(197, 160, 89, 0); }
     }
     .watch-explanation {
       margin: 9px 0 2px;
@@ -711,10 +772,96 @@
     }
     .knowledge-box strong { color: var(--sage-deep); display: block; margin-bottom: 3px; }
 
+    .petition-card {
+      border-color: rgba(197, 160, 89, 0.56);
+      box-shadow: 0 8px 22px rgba(30, 34, 30, 0.075), inset 0 1px 0 rgba(255, 253, 249, 0.85);
+    }
+
+    .petition-category-badge {
+      background: #E8EEE7;
+      color: #2F4538;
+      border: 1px solid rgba(47, 69, 56, 0.14);
+    }
+
+    .petition-scripture {
+      margin-bottom: 10px;
+      color: var(--ink-muted);
+      font-size: 11px;
+    }
+
+    .petition-card .scripture-reference-btn {
+      padding: 4px 8px !important;
+      border: 1px solid rgba(197, 160, 89, 0.34) !important;
+      border-radius: 999px !important;
+      background: #FBF7EE !important;
+      color: #72561C !important;
+      font-size: 11px !important;
+      font-weight: 700 !important;
+      text-decoration: none !important;
+      text-underline-offset: 0 !important;
+    }
+
+    .petition-card .sow-thanks-btn {
+      border: 1px solid rgba(197, 160, 89, 0.55);
+      background: linear-gradient(135deg, #C5A059, #A67E37);
+      color: #FFFFFF;
+      box-shadow: 0 4px 11px rgba(128, 97, 34, 0.15);
+    }
+
+    .audit-composer {
+      border-color: rgba(197, 160, 89, 0.62);
+      background: linear-gradient(145deg, #1E221E 0%, #26362C 100%);
+      color: #F4EFE6;
+      box-shadow: 0 14px 30px rgba(22, 24, 23, 0.2), inset 0 1px 0 rgba(255, 253, 249, 0.07);
+    }
+
+    .audit-composer h3 { color: #F4EFE6; }
+    .audit-composer .field label { color: #E0C27F; }
+
+    .audit-composer .field input,
+    .audit-composer .field select,
+    .audit-composer .field textarea {
+      border-color: rgba(197, 160, 89, 0.38);
+      background: #FFFDF9;
+      color: #1E221E;
+    }
+
+    .audit-save-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .audit-save-option {
+      min-height: 45px;
+      padding: 10px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      line-height: 1.3;
+    }
+
+    .audit-save-option.audit-only {
+      border: 1px solid rgba(232, 198, 111, 0.56);
+      background: rgba(255, 253, 249, 0.07);
+      color: #F4EFE6;
+    }
+
+    .audit-save-option.audit-to-altar {
+      border: 1px solid #C5A059;
+      background: linear-gradient(135deg, #C5A059, #A67E37);
+      color: #FFFFFF;
+    }
+
     .audit-card { cursor: pointer; transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease; }
     .audit-card:hover { border-color: rgba(197, 155, 56, 0.7); box-shadow: 0 8px 22px rgba(22, 24, 23, 0.09); transform: translateY(-1px); }
     .audit-card:focus-visible { outline: 2px solid var(--sage); outline-offset: 3px; }
     .audit-card-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 9px; }
+    .audit-card-title { margin: 6px 0 5px; color: var(--ink-primary); font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px; line-height: 1.15; }
+    .audit-card-reflection { margin: 7px 0 6px; color: var(--ink-secondary); font-size: 12px; line-height: 1.6; white-space: pre-wrap; }
+    .audit-status-pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 999px; font-size: 9px; font-weight: 700; }
+    .audit-status-pill.on-altar { border: 1px solid rgba(197, 160, 89, 0.42); background: rgba(197, 160, 89, 0.15); color: #80601F; }
+    .audit-status-pill.journal-only { border: 1px solid rgba(47, 69, 56, 0.2); background: #E8EEE7; color: #2F4538; }
     .audit-tag {
       display: inline-block;
       padding: 4px 8px;
@@ -745,15 +892,38 @@
       overflow-wrap: anywhere;
     }
     .audit-progress-entry {
+      position: relative;
       padding: 10px 12px;
-      border-left: 3px solid var(--gold);
+      border-left: 0;
       border-radius: 0 10px 10px 0;
-      background: #F7F2E8;
+      background: linear-gradient(115deg, #F7F2E8, #FFFDF9);
       color: var(--ink);
       font-size: 12px;
       line-height: 1.55;
       white-space: pre-wrap;
       overflow-wrap: anywhere;
+      box-shadow: inset 0 0 0 1px rgba(197, 160, 89, 0.16);
+    }
+
+    .audit-progress-timeline {
+      display: grid;
+      gap: 9px;
+      margin-left: 5px;
+      padding-left: 16px;
+      border-left: 1px solid rgba(197, 160, 89, 0.55);
+    }
+
+    .audit-progress-timeline .audit-progress-entry::before {
+      position: absolute;
+      top: 14px;
+      left: -21px;
+      width: 8px;
+      height: 8px;
+      border: 2px solid #FFFDF9;
+      border-radius: 50%;
+      background: #C5A059;
+      box-shadow: 0 0 0 1px rgba(197, 160, 89, 0.35);
+      content: "";
     }
     .audit-guidance-callout {
       margin: 14px 0;
@@ -767,11 +937,29 @@
 
     /* Memorial Stone Card */
     .memorial-stone {
-      background: linear-gradient(145deg, #FFFDF8 0%, #F4EBD7 100%);
-      border: 1.5px solid var(--gold);
-      border-radius: 14px;
-      padding: 15px;
+      position: relative;
+      background: linear-gradient(180deg, #FFFDF9 0%, #F7F0E2 100%);
+      border: 1px solid rgba(197, 160, 89, 0.78);
+      border-radius: 16px;
+      padding: 17px;
       margin-bottom: 12px;
+      box-shadow: inset 0 0 0 1px rgba(197, 160, 89, 0.42), 0 7px 18px rgba(128, 97, 34, 0.07);
+    }
+
+    .memorial-reflection-prompt {
+      display: inline-block;
+      margin-top: 9px;
+      color: #72561C;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .memorial-stone .memorial-thanks-btn {
+      margin-top: 10px;
+      border: 1px solid rgba(197, 160, 89, 0.55);
+      border-radius: 999px;
+      box-shadow: 0 4px 12px rgba(128, 97, 34, 0.12);
     }
 
     /* Filter Chips */
@@ -1377,6 +1565,10 @@
       .scripture-action-pill { width: calc(100vw - 20px); }
       .scripture-action-buttons { gap: 3px; }
       .scripture-action-buttons button { font-size: 9px; }
+      .chamber-tabs { gap: 2px; padding: 3px; }
+      .chamber-btn { padding: 8px 3px; font-size: 9px; }
+      .altar-stats { gap: 5px; }
+      .audit-save-actions { grid-template-columns: 1fr; }
     }
 
     .scripture-highlight-pill {
@@ -1923,8 +2115,8 @@
 
       <!-- Visual Altar Header -->
       <div class="altar-sanctuary">
-        <div style="display:inline-flex; align-items:center; justify-content:center; width:54px; height:54px; border-radius:50%; background:radial-gradient(circle, rgba(197,155,56,0.22) 0%, rgba(197,155,56,0) 72%); margin-bottom:6px;">
-          <svg width="32" height="32" viewBox="0 0 48 48" fill="none" stroke="var(--gold)" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 0 8px rgba(197,155,56,0.55));" aria-hidden="true">
+        <div class="altar-emblem">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M12 5 19 24M36 5 29 24M24 5v18"/>
             <path d="M18 25h12l-2 8h-8l-2-8Z"/>
             <path d="M20 33v4m8-4v4M17 38h14"/>
@@ -2003,7 +2195,7 @@
             <label>Recommended Standing Scriptures</label>
             <div id="scriptureRecommendations"></div>
             <div style="margin-top:10px;">
-              <label for="customScriptureRef">Customize / Look Up Another Verse</label>
+              <label for="customScriptureRef">Customise / Look Up Another Verse</label>
               <div style="display:flex; gap:8px;">
                 <input id="customScriptureRef" type="text" placeholder="e.g., Romans 8:28 or Psalm 23" />
                 <button id="lookupScriptureBtn" class="btn btn-outline btn-sm" style="flex-shrink:0;" type="button">Look Up</button>
@@ -2064,7 +2256,7 @@
         <h2>The Warehouse</h2>
         <p>Execute your daily <strong>Soul Audit</strong> and convert any reflection straight onto your Altar.</p>
       </div>
-      <div class="card">
+      <div class="card audit-composer">
         <div class="field">
           <label>1. What is currently occupying my mental warehouse?</label>
           <textarea id="auditReflect" placeholder="Be honest before God—identify patterns, fears, or assignments..."></textarea>
@@ -2094,9 +2286,9 @@
           <label for="auditTags">Tags / Focus (Optional)</label>
           <input id="auditTags" type="text" placeholder="e.g., anxiety, healing, waiting" />
         </div>
-        <div style="display:grid; gap:8px;">
-          <button id="saveAuditBtn" class="btn btn-primary" type="button">Seal &amp; Save Soul Audit</button>
-          <button id="auditToAltarBtn" class="btn btn-gold" type="button">Save &amp; Lay on the Altar</button>
+        <div class="audit-save-actions">
+          <button id="saveAuditBtn" class="btn audit-save-option audit-only" type="button">Save as Soul Audit Only</button>
+          <button id="auditToAltarBtn" class="btn audit-save-option audit-to-altar" type="button">Lay on Altar &amp; Save</button>
         </div>
       </div>
       <h3 style="font-size:21px; margin:16px 0 10px;">Sealed Audit Ledger</h3>
@@ -2107,7 +2299,7 @@
     <section id="screen-bible" class="screen">
       <div class="section-header">
         <h2>Berean Standard Bible</h2>
-        <p>Read the public-domain BSB, chapter by chapter. Tap a verse number for scripture actions.</p>
+        <p>Read the public-domain BSB, chapter by chapter. Tap a verse to select it and reveal scripture actions.</p>
       </div>
       <div class="bible-view-switcher" role="group" aria-label="Bible views">
         <button class="bible-view-btn active" data-view="read" type="button" aria-pressed="true">Read Bible</button>
@@ -2145,10 +2337,10 @@
     <div id="bibleScriptureActionPill" class="scripture-action-pill" role="group" aria-label="Selected scripture actions" hidden>
       <span id="bibleScriptureActionReference" class="scripture-action-reference"></span>
       <div class="scripture-action-buttons">
-        <button id="bibleActionHighlightBtn" type="button" aria-pressed="false">Highlight</button>
-        <button id="bibleActionLoveBtn" type="button" aria-pressed="false">Love</button>
-        <button id="bibleActionStudyBtn" type="button">Study</button>
-        <button id="bibleActionCopyBtn" type="button">Copy</button>
+        <button id="bibleActionHighlightBtn" type="button" aria-label="Highlight verse with a cherub marker" aria-pressed="false">Highlight</button>
+        <button id="bibleActionLoveBtn" type="button" aria-label="Love this verse" aria-pressed="false">&#9825; Love</button>
+        <button id="bibleActionStudyBtn" type="button" aria-label="Study this verse or open related teaching">Study</button>
+        <button id="bibleActionCopyBtn" type="button" aria-label="Copy verse and reference">Copy</button>
       </div>
       <span id="bibleScriptureActionStatus" class="sr-only" role="status" aria-live="polite"></span>
     </div>
@@ -3848,14 +4040,14 @@
         const tLog = thanksgivingLog[p.id] || { count: 0, lastDate: "" };
         const sowedToday = tLog.lastDate === today;
         return `
-          <div class="card">
+          <div class="card petition-card">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:6px;">
-              <span class="badge" style="margin-bottom:0;">${escapeHTML(p.category)} ${p.visibility === "corporate" ? "• Shared in Agreement" : "• Private Altar"}</span>
+              <span class="badge petition-category-badge" style="margin-bottom:0;">${escapeHTML(p.category)} ${p.visibility === "corporate" ? "• Shared in Agreement" : "• Private Altar"}</span>
               <span class="badge thanksgiving-seed-badge" data-thanksgiving-id="${p.id}" style="margin-bottom:0; background:var(--gold-tint); color:var(--gold-deep); border:1px solid rgba(197,155,56,0.45);">&#128588; ${tLog.count} Thanksgiving ${tLog.count === 1 ? "Seed" : "Seeds"} Sown</span>
             </div>
             <h3 style="font-size:20px; margin-bottom:6px;">${escapeHTML(p.title)}</h3>
             <p style="font-size:13px; color:var(--ink); line-height:1.5; margin-bottom:8px;">${escapeHTML(p.details)}</p>
-            ${p.scripture ? `<p style="font-size:12px; color:var(--gold-deep); font-weight:700; margin-bottom:8px;">Standing On: ${renderScriptureReferences(p.scripture)}</p>` : ""}
+            ${p.scripture ? `<p class="petition-scripture">Standing on: ${renderScriptureReferences(p.scripture)}</p>` : ""}
             <div class="knowledge-box">
               <strong>Renew Your Mind (Hosea 4:6):</strong>
               <span>Recommended Lesson: </span>
@@ -3916,8 +4108,8 @@
             <p style="font-size:13px; color:var(--ink); line-height:1.5; margin-bottom:6px;">${escapeHTML(a.details)}</p>
             <p style="font-size:11px; color:var(--gold-deep); font-weight:700; margin-bottom:7px;">Answered ${escapeHTML(answeredDateLabel(a.answeredAt))}</p>
             ${a.testimony ? `<p style="font-size:13px; font-weight:600; color:var(--sage-deep); background:#FFFFFF; padding:8px 10px; border-radius:8px;">Testimony: "${escapeHTML(a.testimony)}"</p>` : ""}
-            <p style="font-size:10px; color:var(--ink-muted); margin:8px 0 0;">Tap to Celebrate &amp; Reflect on This Season</p>
-            <button class="btn btn-gold btn-sm sow-thanks-btn" data-id="${escapeHTML(a.id)}" data-title="${escapeHTML(a.title)}" type="button" style="margin-top:9px;">&#128588; Sow Thanksgiving for This Testimony</button>
+            <p class="memorial-reflection-prompt">Tap to Celebrate &amp; Reflect on This Season</p>
+            <button class="btn btn-gold btn-sm sow-thanks-btn memorial-thanks-btn" data-id="${escapeHTML(a.id)}" data-title="${escapeHTML(a.title)}" type="button">&#128588; Sow Thanksgiving for This Testimony</button>
             ${Array.isArray(a.journeyLog) && a.journeyLog.length > 0 ? `
               <details style="margin-top:10px; background:#FFFFFF; border:1px solid var(--border); border-radius:10px; padding:10px 12px;">
                 <summary style="font-size:12px; font-weight:700; color:var(--sage-deep); cursor:pointer;">
@@ -4092,7 +4284,7 @@
         ${auditGuidanceMarkup(guidance)}
         <section style="margin-top:18px; padding-top:14px; border-top:1px solid var(--border);">
           <h4 class="serif" style="font-size:22px; color:var(--charcoal); margin-bottom:8px;">Progress &amp; Healing Log</h4>
-          <div id="auditProgressEntries" style="display:grid; gap:8px;">${renderAuditProgressLog(updates)}</div>
+          <div id="auditProgressEntries" class="audit-progress-timeline">${renderAuditProgressLog(updates)}</div>
           <label for="auditProgressUpdate" style="display:block; margin:14px 0 6px; color:var(--sage-deep); font-size:12px; font-weight:700;">Add Progress Update</label>
           <textarea id="auditProgressUpdate" rows="4" placeholder="What has shifted, strengthened, or healed since your last entry?" style="width:100%; min-height:96px; padding:11px; border:1px solid var(--border-gold); border-radius:18px; background:var(--bg-surface); color:var(--ink); font:inherit; font-size:13px; line-height:1.5; resize:vertical;"></textarea>
           <p id="auditProgressStatus" role="status" aria-live="polite" style="font-size:11px; color:var(--sage-deep); margin:7px 0;"></p>
@@ -4270,11 +4462,12 @@
           <article class="card audit-card" data-audit-id="${escapeHTML(audit.id)}" tabindex="0" role="group" aria-label="Soul Audit, ${escapeHTML(audit.category || "General Reflection")}, recorded ${escapeHTML(auditDateLabel(audit.createdAt))}. Read entry or continue your progress.">
             <div class="audit-card-meta">
               <span class="badge" style="margin:0;">${escapeHTML(audit.category || "Soul Audit")}</span>
-              <span class="badge" style="margin:0; background:${isOnAltar ? "var(--gold-tint)" : "var(--sage-tint)"}; color:${isOnAltar ? "var(--gold-deep)" : "var(--sage-deep)"};">${isOnAltar ? "Laid on Altar" : "Journal Only"}</span>
+              <span class="audit-status-pill ${isOnAltar ? "on-altar" : "journal-only"}">${isOnAltar ? "On the Altar • Sow Thanksgiving" : "Soul Audit"}</span>
               <span style="font-size:11px; color:var(--ink-muted);">${escapeHTML(auditDateLabel(audit.createdAt))}</span>
             </div>
             ${tags.map((tag) => `<span class="audit-tag">${escapeHTML(tag)}</span>`).join(" ")}
-            <p style="font-size:13px; line-height:1.55; margin:8px 0 6px; white-space:pre-wrap;">${escapeHTML(audit.reflect || "")}</p>
+            <h3 class="audit-card-title">${escapeHTML(audit.category || "Soul Audit")}</h3>
+            <p class="audit-card-reflection">${escapeHTML(audit.reflect || "")}</p>
             ${audit.action ? `<p style="font-size:11px; color:var(--sage-deep); margin-bottom:6px;"><strong>Next step:</strong> ${escapeHTML(audit.action)}</p>` : ""}
             ${audit.scripture ? `<p style="font-size:12px; color:var(--gold-deep); font-weight:700; margin-bottom:7px;">Anchor: ${renderScriptureReferences(audit.scripture)}</p>` : ""}
             ${auditGuidanceMarkup(guidance, true)}
@@ -4832,11 +5025,14 @@
       }).join(" ")
         .replace(/\d+:\d+\s+Or only begotten or unique; also in verse \d+\s*/gi, " ")
         .replace(/\s+/g, " ")
+        .replace(/\s+([,.;:!?])/g, "$1")
+        .replace(/([“‘])\s+/g, "$1")
+        .replace(/\s+([”’])/g, "$1")
         .trim();
     }
 
     async function fetchBsbChapter(bookCode, chapterNumber) {
-      const cacheKey = `smsf_bsb_v2_${bookCode}_${chapterNumber}`;
+      const cacheKey = `smsf_bsb_v3_${bookCode}_${chapterNumber}`;
       const cached = sessionStorage.getItem(cacheKey);
       if (cached) return JSON.parse(cached);
 
@@ -4885,7 +5081,10 @@
       document.getElementById("bibleScriptureActionReference").textContent = selectedBibleVerse.reference;
       const key = scriptureStorageKey(selectedBibleVerse.reference);
       document.getElementById("bibleActionHighlightBtn").setAttribute("aria-pressed", String(highlightedVerses.has(key)));
-      document.getElementById("bibleActionLoveBtn").setAttribute("aria-pressed", String(lovedVerses.has(key)));
+      const loveButton = document.getElementById("bibleActionLoveBtn");
+      const isLoved = lovedVerses.has(key);
+      loveButton.setAttribute("aria-pressed", String(isLoved));
+      loveButton.innerHTML = `${isLoved ? "&#9829;" : "&#9825;"} Love`;
     }
 
     function updateBibleReadingProgress() {
